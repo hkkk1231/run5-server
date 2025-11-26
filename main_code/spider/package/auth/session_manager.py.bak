@@ -1,0 +1,185 @@
+import requests
+import logging
+import time
+from typing import Optional, Dict, Any
+from .login import login, logout, LoginConfig
+
+
+class SessionManager:
+    """统一的会话管理器，负责创建、管理和清理会话"""
+    
+    def __init__(self):
+        """初始化会话管理器"""
+        self._active_sessions: Dict[str, requests.Session] = {}
+        self._session_tokens: Dict[str, str] = {}
+        self._session_last_used: Dict[str, float] = {}
+        self._session_timeout = 3600  # 会话超时时间（秒）
+        
+    def create_session(self, account: str, headers: Optional[Dict[str, str]] = None) -> requests.Session:
+        """
+        为指定账号创建一个新的会话
+        
+        Args:
+            account: 账号标识符
+            headers: 可选的初始请求头
+            
+        Returns:
+            新创建的会话对象
+        """
+        # 如果已存在该账号的会话，先清理它
+        if account in self._active_sessions:
+            self.cleanup_session(account)
+            
+        # 创建新会话
+        session = requests.Session()
+        if headers:
+            session.headers.update(headers)
+            
+        # 记录会话信息
+        self._active_sessions[account] = session
+        self._session_last_used[account] = time.time()
+        
+        logging.debug(f"为账号 {account} 创建了新会话")
+        return session
+    
+    def login_session(self, account: str, password: str, 
+                     config: Optional[LoginConfig] = None) -> Optional[requests.Session]:
+        """
+        登录并获取认证的会话
+        
+        Args:
+            account: 账号
+            password: 密码
+            config: 登录配置
+            
+        Returns:
+            认证成功的会话对象，失败返回None
+        """
+        # 确保会话存在
+        if account not in self._active_sessions:
+            self.create_session(account)
+            
+        session = self._active_sessions[account]
+        
+        # 执行登录
+        token = login(session, account, password, config)
+        
+        if token:
+            # 保存token
+            self._session_tokens[account] = token
+            self._session_last_used[account] = time.time()
+            logging.info(f"账号 {account} 登录成功")
+            return session
+        else:
+            # 登录失败，清理会话
+            self.cleanup_session(account)
+            logging.warning(f"账号 {account} 登录失败")
+            return None
+    
+    def get_session(self, account: str) -> Optional[requests.Session]:
+        """
+        获取指定账号的会话
+        
+        Args:
+            account: 账号标识符
+            
+        Returns:
+            会话对象，如果不存在返回None
+        """
+        if account not in self._active_sessions:
+            return None
+            
+        # 检查会话是否超时
+        if self._is_session_expired(account):
+            logging.info(f"账号 {account} 的会话已超时，清理中...")
+            self.cleanup_session(account)
+            return None
+            
+        # 更新最后使用时间
+        self._session_last_used[account] = time.time()
+        return self._active_sessions[account]
+    
+    def get_token(self, account: str) -> Optional[str]:
+        """
+        获取指定账号的认证令牌
+        
+        Args:
+            account: 账号标识符
+            
+        Returns:
+            认证令牌，如果不存在返回None
+        """
+        return self._session_tokens.get(account)
+    
+    def update_last_used(self, account: str) -> None:
+        """更新会话的最后使用时间"""
+        if account in self._active_sessions:
+            self._session_last_used[account] = time.time()
+    
+    def logout_session(self, account: str) -> bool:
+        """
+        退出指定账号的会话
+        
+        Args:
+            account: 账号标识符
+            
+        Returns:
+            退出成功返回True，失败返回False
+        """
+        if account not in self._active_sessions:
+            return True  # 会话不存在，视为已退出
+            
+        session = self._active_sessions[account]
+        result = logout(session)
+        
+        # 清理会话信息
+        self.cleanup_session(account)
+        
+        return result
+    
+    def cleanup_session(self, account: str) -> None:
+        """
+        清理指定账号的会话资源
+        
+        Args:
+            account: 账号标识符
+        """
+        if account in self._active_sessions:
+            session = self._active_sessions[account]
+            session.close()  # 关闭会话，释放资源
+            del self._active_sessions[account]
+            
+        if account in self._session_tokens:
+            del self._session_tokens[account]
+            
+        if account in self._session_last_used:
+            del self._session_last_used[account]
+            
+        logging.debug(f"已清理账号 {account} 的会话资源")
+    
+    def cleanup_all_sessions(self) -> None:
+        """清理所有活动会话"""
+        accounts_to_cleanup = list(self._active_sessions.keys())
+        for account in accounts_to_cleanup:
+            self.cleanup_session(account)
+        logging.info("已清理所有会话资源")
+    
+    def _is_session_expired(self, account: str) -> bool:
+        """检查会话是否已超时"""
+        if account not in self._session_last_used:
+            return True
+            
+        last_used = self._session_last_used[account]
+        return (time.time() - last_used) > self._session_timeout
+    
+    def get_active_accounts(self) -> list:
+        """获取所有活动账号列表"""
+        return list(self._active_sessions.keys())
+    
+    def set_session_timeout(self, timeout_seconds: int) -> None:
+        """设置会话超时时间"""
+        self._session_timeout = timeout_seconds
+
+
+# 创建全局会话管理器实例
+session_manager = SessionManager()
