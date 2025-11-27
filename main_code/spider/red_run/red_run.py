@@ -38,7 +38,6 @@ def login_wrapper(username, inner_password):
     # 配置登录参数，不使用代理
     login_config = LoginConfig(
         timeout=5,
-        max_retries=3,
         retry_delay=2,
         use_proxy=False,  # 不使用代理
         proxies=None  # 不设置代理
