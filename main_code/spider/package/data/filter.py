@@ -20,6 +20,9 @@ import json
 import logging
 from datetime import datetime
 
+# 设置日志记录器
+logger = logging.getLogger(__name__)
+
 def today_json_name():
     today = datetime.now().strftime('%Y-%m-%d')
     filename = f'{today}.json'
@@ -129,16 +132,100 @@ def get_long_run_users():
     return long_run_users
 
 def get_red_run_users():
-    all_data = read_excel.extract_data(["学号", "密码", "是否需要红色跑"])
+    # 修复：从Excel中读取红色竞赛用户数据
+    # Excel列名：学号, 密码, 红色竞赛 (不是"是否需要红色跑")
+    # 只有红色竞赛列值为1的用户才会被筛选出来
+    all_data = read_excel.extract_data(["学号", "密码", "红色竞赛"])
     red_run_users = []
 
     for account, info_list in all_data.items():
+        # 第三列是红色竞赛标记，只有值为1才表示需要参加红色跑
         need_red_run = int(info_list[2] or 0)
         if need_red_run == 1:
             password = info_list[1] if info_list[1] else account
             red_run_users.append([account, password])
+            logger.debug(f"找到红色跑用户: {account}")
 
     return red_run_users
+
+def filter_data(html_content):
+    """
+    从跑步页面的HTML内容中提取跑步所需的数据
+    
+    Args:
+        html_content (str): 跑步页面的HTML内容
+        
+    Returns:
+        dict: 包含跑步所需数据的字典
+    """
+    import re
+    import json
+    
+    logger.debug("开始解析跑步页面数据")
+    
+    try:
+        # 尝试从HTML中提取JSON数据
+        # 通常跑步数据会以JavaScript变量的形式存在于页面中
+        # 常见的模式：window.runData = {...} 或 var runData = {...}
+        json_pattern = r'(?:window\.)?runData\s*=\s*({.*?});'
+        matches = re.findall(json_pattern, html_content, re.DOTALL)
+        
+        if matches:
+            # 使用第一个匹配的JSON数据
+            run_data = json.loads(matches[0])
+            logger.debug(f"成功提取跑步数据: {run_data}")
+            return run_data
+        
+        # 如果没有找到runData，尝试查找其他可能的变量名
+        alternative_patterns = [
+            r'(?:window\.)?challengeData\s*=\s*({.*?});',
+            r'(?:window\.)?runInfo\s*=\s*({.*?});',
+            r'challengeId["\']?\s*[:=]\s*["\']?(\d+)',
+            r'data["\']?\s*[:=]\s*({.*?})',
+        ]
+        
+        for pattern in alternative_patterns:
+            matches = re.findall(pattern, html_content, re.DOTALL)
+            if matches:
+                if pattern == r'challengeId["\']?\s*[:=]\s*["\']?(\d+)':
+                    # 如果只找到了challengeId，构造一个基本的数据结构
+                    challenge_id = matches[0]
+                    logger.debug(f"提取到challengeId: {challenge_id}")
+                    return {"challengeId": challenge_id}
+                else:
+                    # 尝试解析JSON数据
+                    try:
+                        data = json.loads(matches[0])
+                        logger.debug(f"使用备用模式提取到数据: {data}")
+                        return data
+                    except json.JSONDecodeError:
+                        continue
+        
+        # 如果都没有找到，尝试从URL或表单中提取
+        url_pattern = r'challengeId["\']?\s*[:=]\s*["\']?(\d+)'
+        url_matches = re.findall(url_pattern, html_content)
+        if url_matches:
+            challenge_id = url_matches[0]
+            logger.debug(f"从URL中提取到challengeId: {challenge_id}")
+            return {"challengeId": challenge_id}
+        
+        # 最后的备选方案：返回一个基本的跑步数据结构
+        logger.warning("无法从页面中提取跑步数据，使用默认数据结构")
+        return {
+            "competitionId": 37,
+            "competitionName": "环校跑",
+            "status": "start"
+        }
+        
+    except Exception as e:
+        logger.error(f"解析跑步数据时出错: {str(e)}")
+        # 返回一个基本的跑步数据结构，确保流程可以继续
+        return {
+            "competitionId": 37,
+            "competitionName": "环校跑",
+            "status": "start"
+        }
+
 
 def main():
     data_before = read_excel.extract_data(["学号", "密码", "长征跑", "手动停止", "目标里程", "<4", "当前里程"])

@@ -230,13 +230,10 @@ class AuthenticationErrorHandler(ErrorHandler):
         if "登录" in error_msg or "认证" in error_msg or "token" in error_msg:
             self.logger.error(f"认证失败: {str(error)}")
             
-            # 如果上下文中有账号信息，将其添加到错误账号管理器
+            # 移除错误账号记录逻辑，只记录日志
             if context and "username" in context:
                 username = context["username"]
-                # 延迟导入以避免循环依赖
-                from ..auth.error_manager import error_account_manager, ErrorType
-                error_account_manager.add_error_account(username, ErrorType.PASSWORD_ERROR, str(error))
-                self.logger.info(f"已将账号 {username} 添加到错误账号列表")
+                self.logger.info(f"账号 {username} 认证失败")
 
 
 # 创建默认的错误处理器实例

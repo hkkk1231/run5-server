@@ -2,6 +2,7 @@ import json
 import random
 import requests
 import hashlib
+from .proxy_detector import check_and_add_ip
 # 提取订单
 """
     orderId:提取订单号
@@ -42,6 +43,12 @@ def get_ip_port():
     ip_dict_list = dc_res["data"]
     #提取列表的字典
     ip_dict_list = [f"{ip_dc['ip']}:{ip_dc['port']}" for ip_dc in ip_dict_list]
+    
+    # 检测IP代理失效
+    if ip_dict_list:
+        for ip in ip_dict_list:
+            check_and_add_ip(ip)
+    
     return ip_dict_list
 
 

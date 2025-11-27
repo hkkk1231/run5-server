@@ -15,6 +15,7 @@ from .logger_manager import setup_module_logger, setup_root_logger as _setup_roo
 def authenticated_operation(error_accounts_list: Optional[List] = None):
     """
     认证操作装饰器，自动处理登录和登出逻辑
+    支持类方法和普通函数
     
     Args:
         error_accounts_list: 用于记录错误账号的列表，如果为None则使用错误账号管理器
@@ -22,44 +23,55 @@ def authenticated_operation(error_accounts_list: Optional[List] = None):
     Returns:
         装饰器函数
     """
+    # 处理无参数调用的情况：@authenticated_operation
+    if callable(error_accounts_list):
+        func = error_accounts_list
+        error_accounts_list = None
+        return authenticated_operation(error_accounts_list)(func)
+    
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        def wrapper(self, *args, **kwargs):
-            # 获取用户名和密码
-            username = getattr(self, 'username', None)
-            password = getattr(self, 'password', None)
+        def wrapper(*args, **kwargs):
+            # 尝试从不同位置获取用户名参数
+            username = None
+            password = None
             
-            if not username or not password:
-                logging.error("用户名或密码未设置")
+            # 如果是类方法，从self获取
+            if args and hasattr(args[0], 'username'):
+                username = getattr(args[0], 'username', None)
+                password = getattr(args[0], 'password', None)
+            
+            # 如果是普通函数，尝试从参数中获取
+            elif args:
+                # 假设第一个参数是username
+                username = args[0] if len(args) > 0 else None
+                # 第二个参数可能是password或account
+                password = args[1] if len(args) > 1 else None
+            
+            # 如果还是没有找到，尝试从kwargs获取
+            if not username:
+                username = kwargs.get('username') or kwargs.get('account')
+            
+            if not password:
+                password = kwargs.get('password')
+            
+            if not username:
+                logging.error("无法确定用户名参数")
                 return False
                 
-            # 创建认证会话
-            # 延迟导入以避免循环依赖
-            from ..auth.login import create_authenticated_session
-            session = create_authenticated_session(username, password)
+            # 检查会话是否已经存在
+            session = session_manager.get_session(username)
             if not session:
-                logging.info(f"账号 {username} 登录失败")
-                
-                # 记录错误账号
-                if error_accounts_list is not None:
-                    error_accounts_list.append([username, password])
-                else:
-                    # 延迟导入以避免循环依赖
-                    from ..auth.error_manager import error_account_manager, ErrorType
-                    error_account_manager.add_error_account(
-                        username, password, ErrorType.PASSWORD_ERROR, "登录失败"
-                    )
-                
+                logging.debug(f"账号 {username} 需要重新认证")
                 return False
             
             # 执行被装饰的函数
             try:
-                result = func(self, *args, **kwargs)
+                result = func(*args, **kwargs)
                 return result
-            finally:
-                # 确保退出登录
-                session_manager.logout_session(username)
-                logging.debug(f"账号 {username} 已退出登录")
+            except Exception as e:
+                logging.error(f"执行认证操作 {func.__name__} 时出错: {str(e)}")
+                return False
                 
         return wrapper
     return decorator
@@ -154,11 +166,8 @@ class BaseOperation:
         session = create_authenticated_session(self.username, self.password)
         if not session:
             self.logger.info(f"账号 {self.username} 登录失败")
-            # 延迟导入以避免循环依赖
-            from ..auth.error_manager import error_account_manager, ErrorType
-            error_account_manager.add_error_account(
-                self.username, self.password, ErrorType.PASSWORD_ERROR, "登录失败"
-            )
+            # 移除错误账号记录逻辑，只记录日志
+            self.logger.error(f"账号 {self.username} 登录失败")
             return False
             
         self.logger.info(f"账号 {self.username} 登录成功")

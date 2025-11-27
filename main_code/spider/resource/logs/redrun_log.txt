@@ -56,3 +56,423 @@
 20:42- 23404010213 还需：01min
 20:43- 23404010213 还需：00min
 20:43- 23404010213 结束结果：操作成功
+2025-11-27 21:13:00 - redrun - INFO - 从表格获取到需要红色跑的用户数量: 0
+2025-11-27 21:24:18 - redrun - ERROR - 安全执行函数 <lambda> 时发生错误: name 'logger' is not defined
+Traceback (most recent call last):
+  File "/root/desktop/run5-server/main_code/spider/package/core/error_handler.py", line 186, in safe_execute
+    return func()
+  File "spider/red_run/red_run.py", line 142, in <lambda>
+    lambda: filter.get_red_run_users(),
+  File "/root/desktop/run5-server/main_code/spider/package/data/filter.py", line 144, in get_red_run_users
+    logger.debug(f"找到红色跑用户: {account}")
+NameError: name 'logger' is not defined
+2025-11-27 21:24:18 - redrun - ERROR - 错误上下文: {'operation': 'get_red_run_users'}
+2025-11-27 21:24:18 - redrun - INFO - 从表格获取到需要红色跑的用户数量: 0
+2025-11-27 21:26:06 - redrun - INFO - 从表格获取到需要红色跑的用户数量: 191
+2025-11-27 21:26:06 - redrun - INFO - 24402050319 还需：27min
+2025-11-27 21:27:06 - redrun - INFO - 24402050319 还需：26min
+2025-11-27 21:28:06 - redrun - INFO - 24402050319 还需：25min
+2025-11-27 21:29:06 - redrun - INFO - 24402050319 还需：24min
+2025-11-27 21:30:06 - redrun - INFO - 24402050319 还需：23min
+2025-11-27 21:31:06 - redrun - INFO - 24402050319 还需：22min
+2025-11-27 21:32:04 - redrun - INFO - 从表格获取到需要红色跑的用户数量: 191
+2025-11-27 21:32:04 - redrun - INFO - 使用 5 个线程处理 191 个账号
+2025-11-27 21:32:04 - redrun - INFO - 24403010317 还需：26min
+2025-11-27 21:32:04 - redrun - INFO - 22610099212 还需：26min
+2025-11-27 21:32:04 - redrun - INFO - 22610099214 还需：25min
+2025-11-27 21:32:04 - redrun - INFO - 24403010326 还需：26min
+2025-11-27 21:32:04 - redrun - INFO - 24402050319 还需：27min
+2025-11-27 21:33:04 - redrun - INFO - 24403010317 还需：25min
+2025-11-27 21:33:04 - redrun - INFO - 22610099212 还需：25min
+2025-11-27 21:33:04 - redrun - INFO - 24403010326 还需：25min
+2025-11-27 21:33:04 - redrun - INFO - 22610099214 还需：24min
+2025-11-27 21:33:04 - redrun - INFO - 24402050319 还需：26min
+2025-11-27 21:34:04 - redrun - INFO - 22610099212 还需：24min
+2025-11-27 21:34:04 - redrun - INFO - 24403010317 还需：24min
+2025-11-27 21:34:04 - redrun - INFO - 22610099214 还需：23min
+2025-11-27 21:34:04 - redrun - INFO - 24403010326 还需：24min
+2025-11-27 21:34:04 - redrun - INFO - 24402050319 还需：25min
+2025-11-27 21:35:04 - redrun - INFO - 22610099212 还需：23min
+2025-11-27 21:35:04 - redrun - INFO - 24403010317 还需：23min
+2025-11-27 21:35:04 - redrun - INFO - 22610099214 还需：22min
+2025-11-27 21:35:04 - redrun - INFO - 24403010326 还需：23min
+2025-11-27 21:35:04 - redrun - INFO - 24402050319 还需：24min
+2025-11-27 21:36:04 - redrun - INFO - 22610099212 还需：22min
+2025-11-27 21:36:04 - redrun - INFO - 24403010317 还需：22min
+2025-11-27 21:36:04 - redrun - INFO - 24403010326 还需：22min
+2025-11-27 21:36:04 - redrun - INFO - 22610099214 还需：21min
+2025-11-27 21:36:04 - redrun - INFO - 24402050319 还需：23min
+2025-11-27 21:37:04 - redrun - INFO - 22610099212 还需：21min
+2025-11-27 21:37:04 - redrun - INFO - 24403010317 还需：21min
+2025-11-27 21:37:04 - redrun - INFO - 24403010326 还需：21min
+2025-11-27 21:37:04 - redrun - INFO - 22610099214 还需：20min
+2025-11-27 21:37:04 - redrun - INFO - 24402050319 还需：22min
+2025-11-27 21:38:04 - redrun - INFO - 22610099212 还需：20min
+2025-11-27 21:38:04 - redrun - INFO - 24403010326 还需：20min
+2025-11-27 21:38:04 - redrun - INFO - 22610099214 还需：19min
+2025-11-27 21:38:04 - redrun - INFO - 24403010317 还需：20min
+2025-11-27 21:38:04 - redrun - INFO - 24402050319 还需：21min
+2025-11-27 21:39:04 - redrun - INFO - 22610099212 还需：19min
+2025-11-27 21:39:04 - redrun - INFO - 22610099214 还需：18min
+2025-11-27 21:39:04 - redrun - INFO - 24403010326 还需：19min
+2025-11-27 21:39:04 - redrun - INFO - 24403010317 还需：19min
+2025-11-27 21:39:04 - redrun - INFO - 24402050319 还需：20min
+2025-11-27 21:40:04 - redrun - INFO - 22610099212 还需：18min
+2025-11-27 21:40:04 - redrun - INFO - 24403010317 还需：18min
+2025-11-27 21:40:04 - redrun - INFO - 22610099214 还需：17min
+2025-11-27 21:40:04 - redrun - INFO - 24403010326 还需：18min
+2025-11-27 21:40:04 - redrun - INFO - 24402050319 还需：19min
+2025-11-27 21:41:04 - redrun - INFO - 22610099212 还需：17min
+2025-11-27 21:41:04 - redrun - INFO - 24403010317 还需：17min
+2025-11-27 21:41:04 - redrun - INFO - 22610099214 还需：16min
+2025-11-27 21:41:04 - redrun - INFO - 24403010326 还需：17min
+2025-11-27 21:41:04 - redrun - INFO - 24402050319 还需：18min
+2025-11-27 21:42:04 - redrun - INFO - 22610099212 还需：16min
+2025-11-27 21:42:04 - redrun - INFO - 24403010317 还需：16min
+2025-11-27 21:42:04 - redrun - INFO - 22610099214 还需：15min
+2025-11-27 21:42:04 - redrun - INFO - 24403010326 还需：16min
+2025-11-27 21:42:04 - redrun - INFO - 24402050319 还需：17min
+2025-11-27 21:43:04 - redrun - INFO - 22610099212 还需：15min
+2025-11-27 21:43:04 - redrun - INFO - 24403010317 还需：15min
+2025-11-27 21:43:04 - redrun - INFO - 22610099214 还需：14min
+2025-11-27 21:43:04 - redrun - INFO - 24402050319 还需：16min
+2025-11-27 21:43:04 - redrun - INFO - 24403010326 还需：15min
+2025-11-27 21:44:04 - redrun - INFO - 22610099212 还需：14min
+2025-11-27 21:44:05 - redrun - INFO - 22610099214 还需：13min
+2025-11-27 21:44:05 - redrun - INFO - 24402050319 还需：15min
+2025-11-27 21:44:05 - redrun - INFO - 24403010326 还需：14min
+2025-11-27 21:44:05 - redrun - INFO - 24403010317 还需：14min
+2025-11-27 21:45:05 - redrun - INFO - 22610099212 还需：13min
+2025-11-27 21:45:05 - redrun - INFO - 22610099214 还需：12min
+2025-11-27 21:45:05 - redrun - INFO - 24402050319 还需：14min
+2025-11-27 21:45:05 - redrun - INFO - 24403010317 还需：13min
+2025-11-27 21:45:05 - redrun - INFO - 24403010326 还需：13min
+2025-11-27 21:46:05 - redrun - INFO - 22610099212 还需：12min
+2025-11-27 21:46:05 - redrun - INFO - 22610099214 还需：11min
+2025-11-27 21:46:05 - redrun - INFO - 24402050319 还需：13min
+2025-11-27 21:46:05 - redrun - INFO - 24403010317 还需：12min
+2025-11-27 21:46:05 - redrun - INFO - 24403010326 还需：12min
+2025-11-27 21:47:05 - redrun - INFO - 22610099212 还需：11min
+2025-11-27 21:47:05 - redrun - INFO - 22610099214 还需：10min
+2025-11-27 21:47:05 - redrun - INFO - 24402050319 还需：12min
+2025-11-27 21:47:05 - redrun - INFO - 24403010326 还需：11min
+2025-11-27 21:47:05 - redrun - INFO - 24403010317 还需：11min
+2025-11-27 21:48:05 - redrun - INFO - 22610099212 还需：10min
+2025-11-27 21:48:05 - redrun - INFO - 22610099214 还需：09min
+2025-11-27 21:48:05 - redrun - INFO - 24402050319 还需：11min
+2025-11-27 21:48:05 - redrun - INFO - 24403010326 还需：10min
+2025-11-27 21:48:05 - redrun - INFO - 24403010317 还需：10min
+2025-11-27 21:49:05 - redrun - INFO - 22610099212 还需：09min
+2025-11-27 21:49:05 - redrun - INFO - 22610099214 还需：08min
+2025-11-27 21:49:05 - redrun - INFO - 24402050319 还需：10min
+2025-11-27 21:49:05 - redrun - INFO - 24403010326 还需：09min
+2025-11-27 21:49:05 - redrun - INFO - 24403010317 还需：09min
+2025-11-27 21:50:05 - redrun - INFO - 22610099212 还需：08min
+2025-11-27 21:50:05 - redrun - INFO - 24403010317 还需：08min
+2025-11-27 21:50:05 - redrun - INFO - 22610099214 还需：07min
+2025-11-27 21:50:05 - redrun - INFO - 24402050319 还需：09min
+2025-11-27 21:50:05 - redrun - INFO - 24403010326 还需：08min
+2025-11-27 21:51:05 - redrun - INFO - 22610099212 还需：07min
+2025-11-27 21:51:05 - redrun - INFO - 24402050319 还需：08min
+2025-11-27 21:51:05 - redrun - INFO - 24403010317 还需：07min
+2025-11-27 21:51:05 - redrun - INFO - 24403010326 还需：07min
+2025-11-27 21:51:05 - redrun - INFO - 22610099214 还需：06min
+2025-11-27 21:52:04 - redrun - INFO - 24403010317 还需：06min
+2025-11-27 21:52:05 - redrun - INFO - 22610099212 还需：06min
+2025-11-27 21:52:05 - redrun - INFO - 22610099214 还需：05min
+2025-11-27 21:52:05 - redrun - INFO - 24403010326 还需：06min
+2025-11-27 21:52:05 - redrun - INFO - 24402050319 还需：07min
+2025-11-27 21:53:04 - redrun - INFO - 22610099214 还需：04min
+2025-11-27 21:53:04 - redrun - INFO - 24403010326 还需：05min
+2025-11-27 21:53:04 - redrun - INFO - 24402050319 还需：06min
+2025-11-27 21:53:04 - redrun - INFO - 24403010317 还需：05min
+2025-11-27 21:53:05 - redrun - INFO - 22610099212 还需：05min
+2025-11-27 21:54:04 - redrun - INFO - 22610099212 还需：04min
+2025-11-27 21:54:04 - redrun - INFO - 22610099214 还需：03min
+2025-11-27 21:54:04 - redrun - INFO - 24403010326 还需：04min
+2025-11-27 21:54:04 - redrun - INFO - 24402050319 还需：05min
+2025-11-27 21:54:04 - redrun - INFO - 24403010317 还需：04min
+2025-11-27 21:55:04 - redrun - INFO - 22610099212 还需：03min
+2025-11-27 21:55:04 - redrun - INFO - 24403010326 还需：03min
+2025-11-27 21:55:04 - redrun - INFO - 22610099214 还需：02min
+2025-11-27 21:55:04 - redrun - INFO - 24402050319 还需：04min
+2025-11-27 21:55:04 - redrun - INFO - 24403010317 还需：03min
+2025-11-27 21:56:04 - redrun - INFO - 22610099212 还需：02min
+2025-11-27 21:56:04 - redrun - INFO - 24403010326 还需：02min
+2025-11-27 21:56:04 - redrun - INFO - 22610099214 还需：01min
+2025-11-27 21:56:04 - redrun - INFO - 24402050319 还需：03min
+2025-11-27 21:56:04 - redrun - INFO - 24403010317 还需：02min
+2025-11-27 21:57:04 - redrun - INFO - 22610099212 还需：01min
+2025-11-27 21:57:04 - redrun - INFO - 24403010326 还需：01min
+2025-11-27 21:57:04 - redrun - INFO - 22610099214 还需：00min
+2025-11-27 21:57:04 - redrun - INFO - 24402050319 还需：02min
+2025-11-27 21:57:04 - redrun - INFO - 24403010317 还需：01min
+2025-11-27 21:58:00 - redrun - ERROR - 安全执行函数 <lambda> 时发生错误: decorator() takes 1 positional argument but 2 were given
+Traceback (most recent call last):
+  File "/root/desktop/run5-server/main_code/spider/package/core/error_handler.py", line 186, in safe_execute
+    return func()
+  File "spider/red_run/red_run.py", line 195, in <lambda>
+    # 报名耐力跑
+TypeError: decorator() takes 1 positional argument but 2 were given
+2025-11-27 21:58:00 - redrun - ERROR - 错误上下文: {'username': '22610099214', 'operation': 'finish_run'}
+2025-11-27 21:58:00 - redrun - WARNING - 账号 22610099214 红色跑流程未完成
+2025-11-27 21:58:01 - redrun - INFO - 22610099211 还需：27min
+2025-11-27 21:58:04 - redrun - INFO - 22610099212 还需：00min
+2025-11-27 21:58:04 - redrun - INFO - 24403010326 还需：00min
+2025-11-27 21:58:04 - redrun - INFO - 24402050319 还需：01min
+2025-11-27 21:58:04 - redrun - INFO - 24403010317 还需：00min
+2025-11-27 21:58:20 - redrun - ERROR - 安全执行函数 <lambda> 时发生错误: decorator() takes 1 positional argument but 2 were given
+Traceback (most recent call last):
+  File "/root/desktop/run5-server/main_code/spider/package/core/error_handler.py", line 186, in safe_execute
+    return func()
+  File "spider/red_run/red_run.py", line 195, in <lambda>
+    # 报名耐力跑
+TypeError: decorator() takes 1 positional argument but 2 were given
+2025-11-27 21:58:20 - redrun - ERROR - 错误上下文: {'username': '24403010326', 'operation': 'finish_run'}
+2025-11-27 21:58:20 - redrun - WARNING - 账号 24403010326 红色跑流程未完成
+2025-11-27 21:58:21 - redrun - INFO - 22610099012 还需：26min
+2025-11-27 21:58:34 - redrun - ERROR - 安全执行函数 <lambda> 时发生错误: decorator() takes 1 positional argument but 2 were given
+Traceback (most recent call last):
+  File "/root/desktop/run5-server/main_code/spider/package/core/error_handler.py", line 186, in safe_execute
+    return func()
+  File "spider/red_run/red_run.py", line 195, in <lambda>
+    # 报名耐力跑
+TypeError: decorator() takes 1 positional argument but 2 were given
+2025-11-27 21:58:34 - redrun - ERROR - 错误上下文: {'username': '22610099212', 'operation': 'finish_run'}
+2025-11-27 21:58:34 - redrun - WARNING - 账号 22610099212 红色跑流程未完成
+2025-11-27 21:58:35 - redrun - INFO - 24408010203 还需：27min
+2025-11-27 21:58:45 - redrun - ERROR - 安全执行函数 <lambda> 时发生错误: decorator() takes 1 positional argument but 2 were given
+Traceback (most recent call last):
+  File "/root/desktop/run5-server/main_code/spider/package/core/error_handler.py", line 186, in safe_execute
+    return func()
+  File "spider/red_run/red_run.py", line 195, in <lambda>
+    # 报名耐力跑
+TypeError: decorator() takes 1 positional argument but 2 were given
+2025-11-27 21:58:45 - redrun - ERROR - 错误上下文: {'username': '24403010317', 'operation': 'finish_run'}
+2025-11-27 21:58:45 - redrun - WARNING - 账号 24403010317 红色跑流程未完成
+2025-11-27 21:58:46 - redrun - INFO - 24408010206 还需：25min
+2025-11-27 21:59:01 - redrun - INFO - 22610099211 还需：26min
+2025-11-27 21:59:04 - redrun - INFO - 24402050319 还需：00min
+2025-11-27 21:59:08 - redrun - ERROR - 安全执行函数 <lambda> 时发生错误: decorator() takes 1 positional argument but 2 were given
+Traceback (most recent call last):
+  File "/root/desktop/run5-server/main_code/spider/package/core/error_handler.py", line 186, in safe_execute
+    return func()
+  File "spider/red_run/red_run.py", line 195, in <lambda>
+    # 报名耐力跑
+TypeError: decorator() takes 1 positional argument but 2 were given
+2025-11-27 21:59:08 - redrun - ERROR - 错误上下文: {'username': '24402050319', 'operation': 'finish_run'}
+2025-11-27 21:59:08 - redrun - WARNING - 账号 24402050319 红色跑流程未完成
+2025-11-27 21:59:09 - redrun - INFO - 24408010218 还需：27min
+2025-11-27 21:59:21 - redrun - INFO - 22610099012 还需：25min
+2025-11-27 21:59:35 - redrun - INFO - 24408010203 还需：26min
+2025-11-27 21:59:46 - redrun - INFO - 24408010206 还需：24min
+2025-11-27 22:00:01 - redrun - INFO - 22610099211 还需：25min
+2025-11-27 22:00:09 - redrun - INFO - 24408010218 还需：26min
+2025-11-27 22:00:21 - redrun - INFO - 22610099012 还需：24min
+2025-11-27 22:00:35 - redrun - INFO - 24408010203 还需：25min
+2025-11-27 22:00:46 - redrun - INFO - 24408010206 还需：23min
+2025-11-27 22:01:01 - redrun - INFO - 22610099211 还需：24min
+2025-11-27 22:01:09 - redrun - INFO - 24408010218 还需：25min
+2025-11-27 22:01:21 - redrun - INFO - 22610099012 还需：23min
+2025-11-27 22:01:35 - redrun - INFO - 24408010203 还需：24min
+2025-11-27 22:01:46 - redrun - INFO - 24408010206 还需：22min
+2025-11-27 22:02:01 - redrun - INFO - 22610099211 还需：23min
+2025-11-27 22:02:09 - redrun - INFO - 24408010218 还需：24min
+2025-11-27 22:02:21 - redrun - INFO - 22610099012 还需：22min
+2025-11-27 22:02:35 - redrun - INFO - 24408010203 还需：23min
+2025-11-27 22:02:46 - redrun - INFO - 24408010206 还需：21min
+2025-11-27 22:03:01 - redrun - INFO - 22610099211 还需：22min
+2025-11-27 22:03:09 - redrun - INFO - 24408010218 还需：23min
+2025-11-27 22:03:21 - redrun - INFO - 22610099012 还需：21min
+2025-11-27 22:42:08 - redrun - INFO - <module>:398 - 从表格获取到需要红色跑的用户数量: 191
+2025-11-27 22:42:08 - redrun - INFO - <module>:406 - 使用 5 个线程处理 191 个账号
+2025-11-27 22:42:08 - redrun - INFO - login_wrapper:47 - 使用代理IP: 112.29.157.134:42209
+2025-11-27 22:42:08 - redrun - INFO - login_wrapper:47 - 使用代理IP: 112.29.157.135:32694
+2025-11-27 22:42:08 - redrun - INFO - login_wrapper:47 - 使用代理IP: 112.29.157.135:36465
+2025-11-27 22:42:08 - redrun - INFO - login_wrapper:47 - 使用代理IP: 112.29.157.136:40567
+2025-11-27 22:42:08 - redrun - INFO - login_wrapper:47 - 使用代理IP: 112.29.157.135:37373
+2025-11-27 22:42:09 - redrun - DEBUG - start:123 - 账号 24403010326 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:42:10 - redrun - ERROR - start:168 - 账号 24403010326 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:42:10 - redrun - INFO - login_wrapper:47 - 使用代理IP: 112.29.157.140:35888
+2025-11-27 22:42:11 - redrun - DEBUG - start:123 - 账号 24402050319 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:42:11 - redrun - ERROR - start:168 - 账号 24402050319 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:42:11 - redrun - INFO - login_wrapper:47 - 使用代理IP: 112.29.157.137:43263
+2025-11-27 22:42:12 - redrun - DEBUG - start:123 - 账号 22610099211 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:42:12 - redrun - ERROR - start:168 - 账号 22610099211 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:42:12 - redrun - DEBUG - start:123 - 账号 22610099012 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:42:12 - redrun - ERROR - start:168 - 账号 22610099012 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:42:12 - redrun - INFO - login_wrapper:47 - 使用代理IP: 112.29.157.136:38665
+2025-11-27 22:42:12 - redrun - INFO - login_wrapper:47 - 使用代理IP: 112.29.157.138:33263
+2025-11-27 22:42:14 - redrun - DEBUG - start:123 - 账号 24408010203 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:42:14 - redrun - ERROR - start:168 - 账号 24408010203 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:42:14 - redrun - INFO - login_wrapper:47 - 使用代理IP: 112.29.157.139:25239
+2025-11-27 22:42:14 - redrun - ERROR - <module>:420 - 账号处理异常: name 'error_accounts' is not defined
+2025-11-27 22:42:14 - redrun - ERROR - <module>:420 - 账号处理异常: name 'error_accounts' is not defined
+2025-11-27 22:42:14 - redrun - INFO - login_wrapper:47 - 使用代理IP: 112.29.157.137:31991
+2025-11-27 22:42:14 - redrun - INFO - login_wrapper:47 - 使用代理IP: 112.29.157.137:41702
+2025-11-27 22:42:15 - redrun - DEBUG - start:123 - 账号 24408010206 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:42:15 - redrun - ERROR - start:168 - 账号 24408010206 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:42:15 - redrun - INFO - login_wrapper:47 - 使用代理IP: 112.29.157.132:25342
+2025-11-27 22:42:15 - redrun - DEBUG - start:123 - 账号 24408010103 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:42:15 - redrun - ERROR - start:168 - 账号 24408010103 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:42:16 - redrun - INFO - login_wrapper:47 - 使用代理IP: 112.29.157.141:42151
+2025-11-27 22:59:55 - redrun - INFO - <module>:385 - 从表格获取到需要红色跑的用户数量: 191
+2025-11-27 22:59:55 - redrun - INFO - <module>:393 - 使用 5 个线程处理 191 个账号
+2025-11-27 22:59:56 - redrun - DEBUG - start:110 - 账号 24403010317 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - DEBUG - start:110 - 账号 24402050319 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - DEBUG - start:110 - 账号 22610099212 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - DEBUG - start:110 - 账号 24403010326 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - DEBUG - start:110 - 账号 22610099214 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - ERROR - start:155 - 账号 24402050319 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - ERROR - start:155 - 账号 24403010326 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - ERROR - start:155 - 账号 24403010317 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - ERROR - start:155 - 账号 22610099212 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - ERROR - start:155 - 账号 22610099214 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - DEBUG - start:110 - 账号 22610099211 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - DEBUG - start:110 - 账号 22610099012 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - DEBUG - start:110 - 账号 24408010203 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - ERROR - start:155 - 账号 22610099211 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - ERROR - start:155 - 账号 22610099012 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - ERROR - start:155 - 账号 24408010203 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - DEBUG - start:110 - 账号 24408010218 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - DEBUG - start:110 - 账号 24408010206 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - ERROR - start:155 - 账号 24408010218 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - ERROR - start:155 - 账号 24408010206 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - DEBUG - start:110 - 账号 24408010103 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - DEBUG - start:110 - 账号 24408010205 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - ERROR - start:155 - 账号 24408010103 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - ERROR - start:155 - 账号 24408010205 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - DEBUG - start:110 - 账号 24408010321 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - ERROR - start:155 - 账号 24408010321 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - DEBUG - start:110 - 账号 24413040247 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:56 - redrun - DEBUG - start:110 - 账号 24413040252 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:57 - redrun - ERROR - start:155 - 账号 24413040247 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:57 - redrun - ERROR - start:155 - 账号 24413040252 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:57 - redrun - DEBUG - start:110 - 账号 24413040255 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:57 - redrun - DEBUG - start:110 - 账号 24413040250 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:57 - redrun - ERROR - start:155 - 账号 24413040255 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:57 - redrun - ERROR - start:155 - 账号 24413040250 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:57 - redrun - DEBUG - start:110 - 账号 24413040253 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:57 - redrun - DEBUG - start:110 - 账号 24404010212 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:57 - redrun - DEBUG - start:110 - 账号 24404010232 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:57 - redrun - ERROR - start:155 - 账号 24413040253 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:57 - redrun - ERROR - start:155 - 账号 24404010212 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:57 - redrun - ERROR - start:155 - 账号 24404010232 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:57 - redrun - DEBUG - start:110 - 账号 24404010216 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:57 - redrun - ERROR - start:155 - 账号 24404010216 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:57 - redrun - DEBUG - start:110 - 账号 24404010239 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:57 - redrun - ERROR - start:155 - 账号 24404010239 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:57 - redrun - DEBUG - start:110 - 账号 24408040115 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:57 - redrun - ERROR - start:155 - 账号 24408040115 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:57 - redrun - ERROR - <module>:407 - 账号处理异常: name 'error_account_manager' is not defined
+2025-11-27 22:59:57 - redrun - ERROR - <module>:407 - 账号处理异常: name 'error_account_manager' is not defined
+2025-11-27 22:59:58 - redrun - DEBUG - start:110 - 账号 24402010203 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - DEBUG - start:110 - 账号 24402010204 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - ERROR - start:155 - 账号 24402010204 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - ERROR - start:155 - 账号 24402010203 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - DEBUG - start:110 - 账号 24418010254 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - DEBUG - start:110 - 账号 24402010214 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - ERROR - start:155 - 账号 24418010254 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - ERROR - start:155 - 账号 24402010214 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - DEBUG - start:110 - 账号 24402010231 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - ERROR - start:155 - 账号 24402010231 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - DEBUG - start:110 - 账号 24402010230 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - DEBUG - start:110 - 账号 24402010212 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - ERROR - start:155 - 账号 24402010230 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - ERROR - start:155 - 账号 24402010212 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - DEBUG - start:110 - 账号 24403010229 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - ERROR - start:155 - 账号 24403010229 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - DEBUG - start:110 - 账号 24403010315 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - ERROR - start:155 - 账号 24403010315 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - DEBUG - start:110 - 账号 24402010209 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - ERROR - start:155 - 账号 24402010209 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - DEBUG - start:110 - 账号 24402010506 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - DEBUG - start:110 - 账号 24402010215 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - DEBUG - start:110 - 账号 24418010253 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - ERROR - start:155 - 账号 24402010506 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - ERROR - start:155 - 账号 24402010215 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - DEBUG - start:110 - 账号 24403010314 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - ERROR - start:155 - 账号 24418010253 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - ERROR - start:155 - 账号 24403010314 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - DEBUG - start:110 - 账号 24413040106 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:58 - redrun - ERROR - start:155 - 账号 24413040106 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:59 - redrun - DEBUG - start:110 - 账号 24401030235 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:59 - redrun - DEBUG - start:110 - 账号 24401030236 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:59 - redrun - ERROR - start:155 - 账号 24401030235 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:59 - redrun - DEBUG - start:110 - 账号 24401030237 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:59 - redrun - ERROR - start:155 - 账号 24401030236 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:59 - redrun - ERROR - start:155 - 账号 24401030237 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:59 - redrun - DEBUG - start:110 - 账号 24401030238 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:59 - redrun - ERROR - start:155 - 账号 24401030238 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:59 - redrun - DEBUG - start:110 - 账号 24401030244 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:59 - redrun - ERROR - start:155 - 账号 24401030244 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:59 - redrun - DEBUG - start:110 - 账号 24407050204 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:59 - redrun - ERROR - start:155 - 账号 24407050204 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:59 - redrun - DEBUG - start:110 - 账号 24413050206 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:59 - redrun - DEBUG - start:110 - 账号 24413050207 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:59 - redrun - ERROR - start:155 - 账号 24413050206 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:59 - redrun - ERROR - start:155 - 账号 24413050207 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:59 - redrun - DEBUG - start:110 - 账号 24413050208 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:59 - redrun - ERROR - start:155 - 账号 24413050208 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:59 - redrun - DEBUG - start:110 - 账号 24413050209 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:59 - redrun - ERROR - start:155 - 账号 24413050209 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 22:59:59 - redrun - DEBUG - start:110 - 账号 24413050115 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - DEBUG - start:110 - 账号 24402010216 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - ERROR - start:155 - 账号 24413050115 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - ERROR - start:155 - 账号 24402010216 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - DEBUG - start:110 - 账号 24402010232 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - ERROR - start:155 - 账号 24402010232 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - DEBUG - start:110 - 账号 24402010233 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - ERROR - start:155 - 账号 24402010233 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - DEBUG - start:110 - 账号 24402010229 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - ERROR - start:155 - 账号 24402010229 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - DEBUG - start:110 - 账号 24413040105 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - DEBUG - start:110 - 账号 24402010213 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - ERROR - start:155 - 账号 24413040105 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - ERROR - start:155 - 账号 24402010213 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - DEBUG - start:110 - 账号 24413040112 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - ERROR - start:155 - 账号 24413040112 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - DEBUG - start:110 - 账号 24407010221 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - ERROR - start:155 - 账号 24407010221 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - DEBUG - start:110 - 账号 24407010223 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - ERROR - start:155 - 账号 24407010223 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - DEBUG - start:110 - 账号 24402030105 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - DEBUG - start:110 - 账号 22603098212 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - ERROR - start:155 - 账号 24402030105 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - ERROR - start:155 - 账号 22603098212 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - DEBUG - start:110 - 账号 22603098213 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - ERROR - start:155 - 账号 22603098213 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - DEBUG - start:110 - 账号 22603098214 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:00 - redrun - ERROR - start:155 - 账号 22603098214 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:01 - redrun - DEBUG - start:110 - 账号 22603098215 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:01 - redrun - ERROR - start:155 - 账号 22603098215 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:01 - redrun - DEBUG - start:110 - 账号 22603098248 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:01 - redrun - DEBUG - start:110 - 账号 24407010222 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:01 - redrun - DEBUG - start:110 - 账号 24413040109 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:01 - redrun - ERROR - start:155 - 账号 24407010222 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:01 - redrun - ERROR - start:155 - 账号 24413040109 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:01 - redrun - DEBUG - start:110 - 账号 24413040111 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:01 - redrun - ERROR - start:155 - 账号 22603098248 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:01 - redrun - ERROR - start:155 - 账号 24413040111 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:01 - redrun - DEBUG - start:110 - 账号 24413040110 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:01 - redrun - ERROR - start:155 - 账号 24413040110 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:01 - redrun - DEBUG - start:110 - 账号 24405010104 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:01 - redrun - DEBUG - start:110 - 账号 24402010512 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:01 - redrun - DEBUG - start:110 - 账号 24402010511 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:01 - redrun - ERROR - start:155 - 账号 24405010104 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:01 - redrun - DEBUG - start:110 - 账号 24401030240 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:01 - redrun - ERROR - start:155 - 账号 24402010512 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:01 - redrun - ERROR - start:155 - 账号 24402010511 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:01 - redrun - ERROR - start:155 - 账号 24401030240 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:01 - redrun - DEBUG - start:110 - 账号 24401030232 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:01 - redrun - ERROR - start:155 - 账号 24401030232 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:02 - redrun - DEBUG - start:110 - 账号 24402010513 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:02 - redrun - DEBUG - start:110 - 账号 24402010515 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:02 - redrun - DEBUG - start:110 - 账号 24401030239 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:02 - redrun - ERROR - start:155 - 账号 24402010513 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:02 - redrun - ERROR - start:155 - 账号 24402010515 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:02 - redrun - ERROR - start:155 - 账号 24401030239 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:02 - redrun - DEBUG - start:110 - 账号 24413040102 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:02 - redrun - ERROR - start:155 - 账号 24413040102 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:02 - redrun - DEBUG - start:110 - 账号 24413040103 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:00:02 - redrun - ERROR - start:155 - 账号 24413040103 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run

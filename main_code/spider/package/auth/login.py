@@ -2,7 +2,7 @@ import requests
 import logging
 import time
 from typing import Optional, Dict, List, Tuple, Union
-from .error_manager import error_account_manager, ErrorType
+# from .error_manager import error_account_manager, ErrorType  # 已移除错误账号管理器
 
 
 class LoginConfig:
@@ -67,8 +67,11 @@ def login(session: requests.Session,
         "uuid": "",
     }
     
-    # 准备请求头
-    headers = {"Content-Type": "application/json"}
+    # 准备请求头，使用session中已有的请求头
+    headers = dict(session.headers)  # 复制session中的所有请求头
+    headers["Content-Type"] = "application/json"  # 确保Content-Type存在
+    
+    # 添加自定义请求头
     if config.custom_headers:
         headers.update(config.custom_headers)
     
@@ -104,26 +107,11 @@ def login(session: requests.Session,
             if msg != "操作成功":
                 logging.warning(f"登录失败，原因: {msg}")
                 
-                # 如果是密码错误且需要跟踪错误账号
-                if track_errors and msg == "用户不存在/密码错误":
-                    error_account_manager.add_error_account(
-                        username, password, ErrorType.PASSWORD_ERROR, msg
-                    )
-                    logging.info(f"密码错误，记录账号: {username}")
-                # 其他错误也记录（如果需要跟踪）
-                elif track_errors:
-                    # 根据错误消息判断错误类型
-                    if "网络" in msg or "连接" in msg or "超时" in msg:
-                        error_type = ErrorType.NETWORK_ERROR
-                    elif "系统" in msg or "服务器" in msg:
-                        error_type = ErrorType.SYSTEM_ERROR
-                    else:
-                        error_type = ErrorType.UNKNOWN_ERROR
-                    
-                    error_account_manager.add_error_account(
-                        username, password, error_type, msg
-                    )
-                    logging.debug(f"记录错误账号: {username}, 类型: {error_type.value}")
+                # 移除错误账号记录逻辑，只记录日志
+                if msg == "用户不存在/密码错误":
+                    logging.info(f"密码错误: {username}")
+                else:
+                    logging.debug(f"登录失败: {username}, 原因: {msg}")
                 
                 return False
             else:
@@ -162,11 +150,7 @@ def login(session: requests.Session,
     # 所有尝试都失败了
     logging.error(f"登录失败，已达到最大重试次数: {config.max_retries}")
 
-    # 记录错误账号（如果需要跟踪）
-    if track_errors:
-        error_account_manager.add_error_account(
-            username, password, ErrorType.UNKNOWN_ERROR, f"登录失败: {last_exception}"
-        )
+    # 移除错误账号记录逻辑，只记录日志
     
     return False
 
@@ -219,29 +203,18 @@ def logout(session: requests.Session, config: Optional[LoginConfig] = None) -> b
 
 def get_error_accounts() -> Tuple[List[List[str]], List[List[str]]]:
     """
-    获取所有错误账号列表
+    获取所有错误账号列表（已移除错误账号管理器，返回空列表）
     
     Returns:
-        Tuple[List[List[str]], List[List[str]]]: (error_accounts, password_error_accounts)
-        第一个列表是所有错误账号，第二个列表是密码错误账号
+        Tuple[List[List[str]], List[List[str]]]: ([], [])
+        保持接口兼容性，但不再返回错误账号
     """
-    # 从错误账号管理器获取所有错误账号
-    all_errors = error_account_manager.get_all_error_accounts()
-    
-    # 获取密码错误账号
-    password_errors = error_account_manager.get_error_accounts_by_type(ErrorType.PASSWORD_ERROR)
-    
-    # 转换为旧格式 [username, password]
-    all_errors_list = [[err.username, err.password] for err in all_errors]
-    password_errors_list = [[err.username, err.password] for err in password_errors]
-    
-    return all_errors_list, password_errors_list
+    return [], []
 
 
 def clear_error_accounts() -> None:
-    """清空错误账号列表"""
-    error_account_manager.clear_all_errors()
-    logging.debug("错误账号列表已清空")
+    """清空错误账号列表（已移除错误账号管理器，保留接口兼容性）"""
+    logging.debug("错误账号列表已清空（空操作）")
 
 
 def create_authenticated_session(username: str, 
@@ -281,8 +254,11 @@ def create_authenticated_session(username: str,
         "uuid": "",
     }
     
-    # 准备请求头
-    request_headers = {"Content-Type": "application/json"}
+    # 准备请求头，使用session中已有的请求头
+    request_headers = dict(session.headers)  # 复制session中的所有请求头
+    request_headers["Content-Type"] = "application/json"  # 确保Content-Type存在
+    
+    # 添加自定义请求头
     if config.custom_headers:
         request_headers.update(config.custom_headers)
     
@@ -324,20 +300,11 @@ def create_authenticated_session(username: str,
                         username, password, ErrorType.PASSWORD_ERROR, msg
                     )
                     logging.info(f"密码错误，记录账号: {username}")
-                # 其他错误也记录（如果需要跟踪）
-                elif track_errors:
-                    # 根据错误消息判断错误类型
-                    if "网络" in msg or "连接" in msg or "超时" in msg:
-                        error_type = ErrorType.NETWORK_ERROR
-                    elif "系统" in msg or "服务器" in msg:
-                        error_type = ErrorType.SYSTEM_ERROR
-                    else:
-                        error_type = ErrorType.UNKNOWN_ERROR
-                    
-                    error_account_manager.add_error_account(
-                        username, password, error_type, msg
-                    )
-                    logging.debug(f"记录错误账号: {username}, 类型: {error_type.value}")
+                # 移除错误账号记录逻辑，只记录日志
+                if msg == "用户不存在/密码错误":
+                    logging.info(f"密码错误: {username}")
+                else:
+                    logging.debug(f"登录失败: {username}, 原因: {msg}")
                 
                 session.close()  # 关闭会话，释放资源
                 return None
@@ -377,10 +344,6 @@ def create_authenticated_session(username: str,
 
     # 所有尝试都失败了
     logging.error(f"登录失败，已达到最大重试次数: {config.max_retries}")
-
-    # 记录错误账号（如果需要跟踪）
-    if track_errors and [username, password] not in error_accounts:
-        error_accounts.append([username, password])
     
     session.close()  # 关闭会话，释放资源
     return None

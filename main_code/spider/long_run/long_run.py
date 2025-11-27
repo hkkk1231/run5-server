@@ -14,11 +14,12 @@ if PROJECT_ROOT not in sys.path:
 
 # 统一导入：所有模块都使用绝对导入
 from main_code.spider.package.network.get_headers import get_headers
+from main_code.spider.package.network.get_ip_port import get_ip_port
 from main_code.spider.package.data import filter
 from main_code.spider.package.query_spider import Query
 from main_code.spider.package.auth.login import LoginConfig, create_authenticated_session
 from main_code.spider.package.auth.session_manager import session_manager
-from main_code.spider.package.auth.error_manager import error_account_manager, ErrorType
+# from main_code.spider.package.auth.error_manager import error_account_manager, ErrorType  # 已移除错误账号管理器
 from main_code.spider.package.core.common_utils import setup_logger, setup_root_logger
 from main_code.spider.long_run.fake_key import encrypt_timestamp
 
@@ -27,6 +28,9 @@ from paths import SPIDER_LOGS_DIR
 
 # 配置 longrun 专用 logger（不需要配置根日志器，避免重复打印）
 logger = setup_logger("longrun", str(SPIDER_LOGS_DIR / "longrun_log.txt"))
+
+# 临时错误账号列表，用于存储超过12次重试失败的账号
+temporary_error_accounts = []
 
 
 def get_run_param(less_4km):
@@ -55,12 +59,26 @@ class RUN:
 
     def login(self, inner_account, inner_password):
         """使用统一的会话管理器进行登录"""
+        # 获取代理IP
+        proxies_list = get_ip_port()
+        proxies = {}
+        if proxies_list:
+            proxy_ip = proxies_list[0]  # 使用第一个代理
+            proxies = {
+                'http': f'http://{proxy_ip}',
+                'https': f'http://{proxy_ip}'
+            }
+            logger.info(f"使用代理IP: {proxy_ip}")
+        else:
+            logger.warning("未能获取到代理IP，将使用直连")
+        
         # 配置登录参数，包括代理
         login_config = LoginConfig(
             timeout=5,
-            max_retries=3,
+            max_retries=12,  # 提高重试次数到12次
             retry_delay=2,
-            use_proxy=True
+            use_proxy=True,
+            proxies=proxies  # 添加代理配置
         )
         
         # 获取请求头
@@ -83,9 +101,13 @@ class RUN:
             return session_manager._session_tokens[inner_account]
         else:
             logger.info(f"登录失败：{inner_account}")
+            # 登录失败（12次重试后）添加到临时错误列表
+            if [inner_account, inner_password] not in temporary_error_accounts:
+                temporary_error_accounts.append([inner_account, inner_password])
+                logger.debug(f"账号 {inner_account} 已添加到临时错误列表")
             return False
 
-    def start(self, account, start_time_to_use):
+    def start(self, account, start_time_to_use, password=None):
         """发送开始跑步请求"""
         start_url = "https://lb.hnfnu.edu.cn/school/student/addLMRanking"
         # 生成操场内的随机经纬度
@@ -104,6 +126,10 @@ class RUN:
             session = session_manager.get_session(account)
             if not session:
                 logger.error(f"无法获取账号 {account} 的会话")
+                # 添加到临时错误列表
+                if password and [account, password] not in temporary_error_accounts:
+                    temporary_error_accounts.append([account, password])
+                    logger.debug(f"账号 {account} 因无法获取会话已添加到临时错误列表")
                 return False
                 
             # 使用会话进行请求
@@ -116,15 +142,27 @@ class RUN:
                 return response_json  # 返回完整的json，包含data_id
             elif response_json["msg"] == "请求频繁！":
                 logger.warning("提交开始时，出现请求频繁错误")
+                # 请求频繁也需要添加到临时错误列表，下次重试
+                if password and [account, password] not in temporary_error_accounts:
+                    temporary_error_accounts.append([account, password])
+                    logger.debug(f"账号 {account} 因请求频繁已添加到临时错误列表")
                 return False
             else:
-                logger.warning("开始跑步失败，正在重试...")
+                logger.warning(f"开始跑步失败: {response_json.get('msg', '未知错误')}")
+                # 添加到临时错误列表
+                if password and [account, password] not in temporary_error_accounts:
+                    temporary_error_accounts.append([account, password])
+                    logger.debug(f"账号 {account} 因开始跑步失败已添加到临时错误列表")
                 return False
         except requests.exceptions.RequestException as e:
             # 控制台只显示简短信息
             logger.warning("开始跑步请求异常，正在重试...")
             # 详细异常信息只记录到文件
             logger.debug(f"开始跑步请求异常详情: {str(e)}", exc_info=True)
+            # 添加到临时错误列表
+            if password and [account, password] not in temporary_error_accounts:
+                temporary_error_accounts.append([account, password])
+                logger.debug(f"账号 {account} 因请求异常已添加到临时错误列表")
             return False
 
     def start_and_finish(self, account, password, less_4km):
@@ -150,16 +188,13 @@ class RUN:
             logger.info(f"里程：{mileage}km；时长：{passtime}；速度：{speed}m/s")
 
             # 3. 调用 start() 函数
-            start_respond_json = self.start(account, start_time_format)
+            start_respond_json = self.start(account, start_time_format, password)
 
             if start_respond_json and start_respond_json.get("msg") == "操作成功":
                 data_id = start_respond_json["data"]
             else:
                 logger.error("开始跑步失败，终止本次操作")
-                # 记录到错误账号列表，以便重试
-                error_account_manager.add_error_account(
-                    account, password, ErrorType.SYSTEM_ERROR, "开始跑步失败"
-                )
+                # start() 函数内部已经处理了临时错误列表，这里不需要重复添加
                 return
 
             # 4. 准备结束请求
@@ -208,26 +243,26 @@ class RUN:
                     logger.info("今天已完成4.0公里")
                     filter.add_one(account)
                 elif "工具调用" in msg:  # 使用 in 判断，更健壮
-                    logger.error(f"结束响应为工具调用: {msg}，已计入错误列表")
-                    # 记录到错误账号列表，以便重试
-                    error_account_manager.add_error_account(
-                        account, password, ErrorType.SYSTEM_ERROR, f"工具调用检测: {msg}"
-                    )
+                    logger.error(f"结束响应为工具调用: {msg}")
+                    # 工具调用错误也需要添加到临时错误列表
+                    if [account, password] not in temporary_error_accounts:
+                        temporary_error_accounts.append([account, password])
+                        logger.debug(f"账号 {account} 因工具调用错误已添加到临时错误列表")
                 else:
-                    logger.error(f"结束失败，正在重试...")
-                    # 记录到错误账号列表，以便重试
-                    error_account_manager.add_error_account(
-                        account, password, ErrorType.SYSTEM_ERROR, f"结束跑步失败: {msg}"
-                    )
+                    logger.error(f"结束失败: {msg}")
+                    # 其他结束失败也需要添加到临时错误列表
+                    if [account, password] not in temporary_error_accounts:
+                        temporary_error_accounts.append([account, password])
+                        logger.debug(f"账号 {account} 因结束跑步失败已添加到临时错误列表")
             except requests.exceptions.RequestException as e:
                 # 控制台只显示简短信息
                 logger.warning("结束跑步请求异常")
                 # 详细异常信息只记录到文件
                 logger.debug(f"结束跑步请求异常详情: {str(e)}", exc_info=True)
-                # 记录到错误账号列表，以便重试
-                error_account_manager.add_error_account(
-                    account, password, ErrorType.NETWORK_ERROR, "结束跑步请求异常"
-                )
+                # 请求异常也需要添加到临时错误列表
+                if [account, password] not in temporary_error_accounts:
+                    temporary_error_accounts.append([account, password])
+                    logger.debug(f"账号 {account} 因结束请求异常已添加到临时错误列表")
 
         except Exception as e:
             # 捕获所有其他未知异常
@@ -235,6 +270,10 @@ class RUN:
             logger.critical("start_and_finish 发生未知严重错误")
             # 详细异常信息只记录到文件
             logger.debug(f"start_and_finish 异常详情: {str(e)}", exc_info=True)
+            # 未知异常也需要添加到临时错误列表
+            if [account, password] not in temporary_error_accounts:
+                temporary_error_accounts.append([account, password])
+                logger.debug(f"账号 {account} 因未知异常已添加到临时错误列表")
 
     def logout(self, account):
         """使用统一的会话管理器退出登录"""
@@ -310,20 +349,18 @@ class RUN:
             accounts = [[account, details[0]] for account, details in user_details.items()]
             logger.info(f"经过筛选后需要执行的用户数量: {len(accounts)}")
         
+        # 添加临时错误列表中的账号到处理列表（如果不在主列表中）
+        for error_account in temporary_error_accounts:
+            if error_account not in accounts:
+                accounts.append(error_account)
+                logger.debug(f"从临时错误列表添加账号: {error_account[0]}")
+        
         account_len = len(accounts)
-        logger.info(f"本次执行数量: {account_len}")
+        logger.info(f"本次执行数量: {account_len} (包括{len(temporary_error_accounts)}个临时错误账号)")
         index = 1
-
-        # 获取全局错误账号列表，避免重复尝试密码错误的账号
-        # 使用统一的错误账号管理器获取密码错误账号
-        password_error_accounts = error_account_manager.get_error_accounts_by_type(ErrorType.PASSWORD_ERROR)
-        password_error_usernames = [err.username for err in password_error_accounts]
+        success_count = 0
         
         for account, password in accounts:
-            # 如果密码错误，直接跳过
-            if account in password_error_usernames:
-                continue
-
             # 从user_details中获取less_4km参数
             less_4km = 0  # 默认值
             if account in user_details:
@@ -334,13 +371,28 @@ class RUN:
             logger.info(f"({index}/{account_len})")
             logger.info(f"( 当前学号: {account};密码 {password})")
 
+            # 检查是否是临时错误账号
+            is_temp_error = [account, password] in temporary_error_accounts
+            if is_temp_error:
+                logger.debug(f"账号 {account} 来自临时错误列表，正在重试")
+
             login_token = self.login(account, password)
 
             if login_token:
                 self.start_and_finish(account, password, less_4km)
                 # 直接使用当前session查询记录，不创建新的Query实例
                 self.query_and_update_mileage(account, login_token)
+                success_count += 1
+                
+                # 如果是临时错误账号且登录成功，从临时错误列表中移除
+                if is_temp_error and [account, password] in temporary_error_accounts:
+                    temporary_error_accounts.remove([account, password])
+                    logger.info(f"账号 {account} 已从临时错误列表中移除")
+            else:
+                logger.debug(f"账号 {account} 处理失败")
+                # 登录失败已经在login方法中处理了临时错误列表，这里不需要额外处理
 
+            # 无论登录是否成功，都要清理会话状态
             self.logout(account)  # 使用统一的会话管理器清理会话状态
 
             index += 1
@@ -348,18 +400,22 @@ class RUN:
             elapsed = loop_end - loop_now
             logger.info(f"该账号处理完成，耗时：{round(elapsed, 2)}s")
 
-        # 获取最新的错误账号列表
-        all_errors = error_account_manager.get_all_error_accounts()
-        password_errors = error_account_manager.get_error_accounts_by_type(ErrorType.PASSWORD_ERROR)
-
-        # 转换为旧格式以便日志显示
-        error_accounts_list = [[err.username, err.password] for err in all_errors.values()]
-        password_errors_list = [[err.username, err.password] for err in password_errors]
-
-        logger.info(f"本轮失败账号：{error_accounts_list}，将在重试循环中继续尝试")
-        if password_errors_list:
-            logger.info(f"密码错误（永久跳过）：{password_errors_list}")
-        return len(all_errors)
+        failed_count = len(accounts) - success_count
+        logger.info(f"本轮成功账号：{success_count}，失败账号：{failed_count}")
+        
+        # 记录临时错误列表状态，列出所有失败账号的学号
+        if temporary_error_accounts:
+            # 列出所有失败账号的学号，便于查看
+            all_error_accounts = [acc[0] for acc in temporary_error_accounts]
+            error_accounts_str = ", ".join(all_error_accounts)
+            logger.info(f"临时错误列表中有 {len(temporary_error_accounts)} 个账号: {error_accounts_str}")
+            
+            # 同时记录到调试日志中，便于后续分析
+            logger.debug(f"完整临时错误列表: {temporary_error_accounts}")
+        else:
+            logger.info("临时错误列表为空")
+            
+        return failed_count
 
 
 def main():
@@ -375,7 +431,12 @@ def main():
             logger.info("==============================================")
             logger.info(f"第 {i} 次运行脚本")
             instance = RUN()
-            failed_count = instance.main()
+            try:
+                failed_count = instance.main()
+            except Exception as e:
+                logger.error(f"执行过程中发生异常: {str(e)}")
+                logger.debug(f"异常详情: {str(e)}", exc_info=True)
+                failed_count = -1  # 使用-1表示异常情况
 
             # 如果有失败账号且未达到最大重试次数，则等待后重试
             if failed_count > 0 and i < 10:
@@ -387,8 +448,8 @@ def main():
                 logger.info("==============================================")
                 if failed_count == 0:
                     logger.info("所有账号均已成功，脚本完成。")
-                    # 清空错误账号列表，为下次运行做准备
-                    error_account_manager.clear_all_errors()
+                elif failed_count < 0:
+                    logger.warning("执行过程中发生异常，但脚本将继续运行。")
                 else:
                     logger.warning("已达到最大重试次数(10次)，脚本结束。")
                 break
