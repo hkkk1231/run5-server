@@ -144,7 +144,8 @@ def get_red_run_users():
         if need_red_run == 1:
             password = info_list[1] if info_list[1] else account
             red_run_users.append([account, password])
-            logger.debug(f"找到红色跑用户: {account}")
+            # 使用模块级别的logger
+            logging.debug(f"找到红色跑用户: {account}")
 
     return red_run_users
 

@@ -74,9 +74,32 @@ def sign_up(account):
         logger.error(f"无法获取账号 {account} 的会话")
         return False
     
-    # 提交报名数据
-    session.post(json=data, url=sign_url, headers=session.headers)
-    return True
+    try:
+        # 提交报名数据
+        logger.debug(f"账号 {account} 开始报名环校跑")
+        sign_response = session.post(json=data, url=sign_url, headers=session.headers)
+        sign_response.raise_for_status()  # 检查HTTP错误
+        
+        # 解析报名响应
+        response_json = sign_response.json()
+        msg = response_json.get("msg", "")
+        
+        # 检查报名结果
+        if msg == "操作成功" or "报名成功" in msg:
+            logger.info(f"账号 {account} 环校跑报名成功")
+            return True
+        elif "已参加该竞赛" in msg or "已报名" in msg:
+            logger.info(f"账号 {account} 已经报名过环校跑")
+            return True
+        else:
+            logger.warning(f"账号 {account} 环校跑报名失败: {msg}")
+            logger.debug(f"账号 {account} 报名响应详情: {response_json}")
+            return False
+            
+    except Exception as e:
+        logger.error(f"账号 {account} 报名请求异常: {str(e)}")
+        logger.debug(f"账号 {account} 报名异常详情", exc_info=True)
+        return False
 
 @authenticated_operation
 def start(account):
@@ -107,51 +130,44 @@ def start(account):
         logger.error(f"账号 {account} 报名失败")
         return None
     
-    # 请求跑步页面url
-    run_url = "https://lb.hnfnu.edu.cn/school/run"
-    logger.debug(f"账号 {account} 请求跑步页面: {run_url}")
+    # 开始跑步url（使用正确的URL）
+    start_url = "https://lb.hnfnu.edu.cn/school/challenges"
+    logger.debug(f"账号 {account} 开始跑步请求: {start_url}")
     
     try:
-        response = session.get(run_url, headers=session.headers)
-        response.raise_for_status()  # 检查HTTP错误
-        
-        # 解析跑步页面数据，提取challenge_id等信息
-        data = filter.filter_data(response.text)
-        logger.debug(f"账号 {account} 解析到的跑步数据: {data}")
+        # 使用空数据对象开始跑步（参考旧版本成功实现）
+        data = {}
+        logger.debug(f"账号 {account} 提交开始跑步请求")
         
         # 提交开始跑步的请求
-        start_response = session.post(json=data, url=run_url, headers=session.headers)
+        start_response = session.post(json=data, url=start_url, headers=session.headers)
         start_response.raise_for_status()
         
-        # 尝试从响应中提取challenge_id
-        challenge_id = None
-        
-        # 首先尝试从提交的数据中获取
-        if isinstance(data, dict) and 'challengeId' in data:
-            challenge_id = data['challengeId']
-            logger.debug(f"账号 {account} 从提交数据中获取到challenge_id: {challenge_id}")
-        
-        # 如果没有，尝试从响应中获取
-        if not challenge_id:
-            try:
-                response_data = start_response.json()
-                if 'challengeId' in response_data:
-                    challenge_id = response_data['challengeId']
-                    logger.debug(f"账号 {account} 从响应中获取到challenge_id: {challenge_id}")
-                elif 'data' in response_data and isinstance(response_data['data'], dict) and 'challengeId' in response_data['data']:
-                    challenge_id = response_data['data']['challengeId']
-                    logger.debug(f"账号 {account} 从响应data中获取到challenge_id: {challenge_id}")
-            except (ValueError, KeyError) as e:
-                logger.debug(f"账号 {account} 从响应中提取challenge_id失败: {str(e)}")
-        
-        # 最后的备选方案：使用当前时间戳作为challenge_id
-        if not challenge_id:
-            import time
-            challenge_id = int(time.time())
-            logger.warning(f"账号 {account} 无法获取challenge_id，使用时间戳作为备选: {challenge_id}")
-        
-        logger.info(f"账号 {account} 开始跑步成功，challenge_id: {challenge_id}")
-        return challenge_id
+        # 从响应中提取challenge_id（参考旧版本实现）
+        try:
+            response_json = start_response.json()
+            msg = response_json.get("msg", "")
+            
+            # 检查是否已经完成
+            if msg == "今日已完成挑战,请明天再来":
+                logger.info(f"账号 {account} 今天跑过了")
+                return None
+            
+            # 提取challenge_id
+            response_data = response_json.get("data", {})
+            if isinstance(response_data, dict) and "challengeId" in response_data:
+                challenge_id = response_data["challengeId"]
+                logger.info(f"账号 {account} 开始跑步成功，challenge_id: {challenge_id}")
+                return challenge_id
+            else:
+                logger.error(f"账号 {account} 响应中未找到challenge_id")
+                logger.debug(f"账号 {account} 响应数据: {response_json}")
+                return None
+                
+        except (ValueError, KeyError) as e:
+            logger.error(f"账号 {account} 解析开始跑步响应失败: {str(e)}")
+            logger.debug(f"账号 {account} 原始响应内容: {start_response.text[:200]}...")
+            return None
         
     except Exception as e:
         logger.error(f"账号 {account} 开始跑步时发生错误: {str(e)}")
