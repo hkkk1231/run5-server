@@ -75,7 +75,6 @@ class RUN:
         # 配置登录参数，包括代理
         login_config = LoginConfig(
             timeout=5,
-            max_retries=12,  # 提高重试次数到12次
             retry_delay=2,
             use_proxy=True,
             proxies=proxies  # 添加代理配置

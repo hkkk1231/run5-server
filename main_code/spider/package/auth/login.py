@@ -11,7 +11,7 @@ class LoginConfig:
     def __init__(self, 
                  login_url: str = "https://lb.hnfnu.edu.cn/login",
                  timeout: int = 10,
-                 max_retries: int = 3,
+                 max_retries: int = 5,
                  retry_delay: float = 2.0,
                  use_proxy: bool = False,
                  proxies: Optional[Dict[str, str]] = None,
@@ -133,8 +133,8 @@ def login(session: requests.Session,
 
         except requests.exceptions.RequestException as e:
             last_exception = e
-            # 控制台只显示简短信息
-            logging.warning(f"登录请求异常 (尝试 {attempt + 1}/{config.max_retries})")
+            # 控制台不显示登录请求异常信息
+            logging.debug(f"登录请求异常 (尝试 {attempt + 1}/{config.max_retries})")
             # 详细异常信息只记录到文件
             logging.debug(f"异常详情: {str(e)}", exc_info=True)
 
@@ -294,12 +294,6 @@ def create_authenticated_session(username: str,
             if msg != "操作成功":
                 logging.warning(f"登录失败，原因: {msg}")
                 
-                # 如果是密码错误且需要跟踪错误账号
-                if track_errors and msg == "用户不存在/密码错误":
-                    error_account_manager.add_error_account(
-                        username, password, ErrorType.PASSWORD_ERROR, msg
-                    )
-                    logging.info(f"密码错误，记录账号: {username}")
                 # 移除错误账号记录逻辑，只记录日志
                 if msg == "用户不存在/密码错误":
                     logging.info(f"密码错误: {username}")
@@ -328,8 +322,8 @@ def create_authenticated_session(username: str,
 
         except requests.exceptions.RequestException as e:
             last_exception = e
-            # 控制台只显示简短信息
-            logging.warning(f"登录请求异常 (尝试 {attempt + 1}/{config.max_retries})")
+            # 控制台不显示登录请求异常信息
+            logging.debug(f"登录请求异常 (尝试 {attempt + 1}/{config.max_retries})")
             # 详细异常信息只记录到文件
             logging.debug(f"异常详情: {str(e)}", exc_info=True)
 

@@ -476,3 +476,40 @@ TypeError: decorator() takes 1 positional argument but 2 were given
 2025-11-27 23:00:02 - redrun - ERROR - start:155 - 账号 24413040102 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
 2025-11-27 23:00:02 - redrun - DEBUG - start:110 - 账号 24413040103 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
 2025-11-27 23:00:02 - redrun - ERROR - start:155 - 账号 24413040103 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:41:19 - redrun - INFO - <module>:408 - 使用手动注入模式
+2025-11-27 23:41:19 - redrun - INFO - preprocess_accounts:395 - 账号去重后数量: 1
+2025-11-27 23:41:19 - redrun - INFO - <module>:421 - 手动注入的账号数量: 1
+2025-11-27 23:41:19 - redrun - INFO - <module>:444 - 使用 1 个线程处理 1 个账号
+2025-11-27 23:41:19 - redrun - ERROR - <module>:458 - 账号处理异常: name 'error_account_manager' is not defined
+2025-11-27 23:41:19 - redrun - INFO - <module>:460 - 所有账号处理完成
+2025-11-27 23:41:34 - redrun - INFO - <module>:408 - 使用手动注入模式
+2025-11-27 23:41:34 - redrun - INFO - preprocess_accounts:395 - 账号去重后数量: 1
+2025-11-27 23:41:34 - redrun - INFO - <module>:421 - 手动注入的账号数量: 1
+2025-11-27 23:41:34 - redrun - INFO - <module>:444 - 使用 1 个线程处理 1 个账号
+2025-11-27 23:41:34 - redrun - INFO - login_wrapper:53 - 24405010421的密码错误
+2025-11-27 23:41:34 - redrun - INFO - <module>:460 - 所有账号处理完成
+2025-11-27 23:41:38 - redrun - INFO - <module>:408 - 使用手动注入模式
+2025-11-27 23:41:38 - redrun - INFO - preprocess_accounts:395 - 账号去重后数量: 3
+2025-11-27 23:41:38 - redrun - INFO - <module>:421 - 手动注入的账号数量: 3
+2025-11-27 23:41:38 - redrun - INFO - <module>:444 - 使用 3 个线程处理 3 个账号
+2025-11-27 23:41:38 - redrun - INFO - login_wrapper:53 - 24405010422的密码错误
+2025-11-27 23:41:38 - redrun - INFO - login_wrapper:53 - 24405010421的密码错误
+2025-11-27 23:41:38 - redrun - INFO - login_wrapper:53 - 24405010423的密码错误
+2025-11-27 23:41:38 - redrun - INFO - <module>:460 - 所有账号处理完成
+2025-11-27 23:41:41 - redrun - INFO - <module>:408 - 使用手动注入模式
+2025-11-27 23:41:41 - redrun - WARNING - preprocess_accounts:393 - 发现重复账号 24405010421，已跳过
+2025-11-27 23:41:41 - redrun - INFO - preprocess_accounts:395 - 账号去重后数量: 2
+2025-11-27 23:41:41 - redrun - INFO - <module>:421 - 手动注入的账号数量: 2
+2025-11-27 23:41:41 - redrun - INFO - <module>:444 - 使用 2 个线程处理 2 个账号
+2025-11-27 23:41:41 - redrun - INFO - login_wrapper:53 - 24405010421的密码错误
+2025-11-27 23:41:41 - redrun - INFO - login_wrapper:53 - 24405010422的密码错误
+2025-11-27 23:41:41 - redrun - INFO - <module>:460 - 所有账号处理完成
+2025-11-27 23:41:44 - redrun - INFO - <module>:408 - 使用手动注入模式
+2025-11-27 23:41:44 - redrun - ERROR - <module>:424 - 测试数据格式错误: Expecting value: line 1 column 1 (char 0)
+2025-11-27 23:41:46 - redrun - INFO - <module>:408 - 使用手动注入模式
+2025-11-27 23:41:46 - redrun - INFO - preprocess_accounts:395 - 账号去重后数量: 1
+2025-11-27 23:41:46 - redrun - INFO - <module>:421 - 手动注入的账号数量: 1
+2025-11-27 23:41:46 - redrun - INFO - <module>:444 - 使用 1 个线程处理 1 个账号
+2025-11-27 23:41:46 - redrun - DEBUG - start:111 - 账号 24405010421 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:41:47 - redrun - ERROR - start:156 - 账号 24405010421 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
+2025-11-27 23:41:47 - redrun - INFO - <module>:460 - 所有账号处理完成
