@@ -1,3 +1,4 @@
+# 修复失败，经测试仍然没有报名
 import os
 import sys
 import time
