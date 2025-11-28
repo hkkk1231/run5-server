@@ -513,3 +513,27 @@ TypeError: decorator() takes 1 positional argument but 2 were given
 2025-11-27 23:41:46 - redrun - DEBUG - start:111 - 账号 24405010421 请求跑步页面: https://lb.hnfnu.edu.cn/school/run
 2025-11-27 23:41:47 - redrun - ERROR - start:156 - 账号 24405010421 开始跑步时发生错误: 404 Client Error:  for url: https://lb.hnfnu.edu.cn/school/run
 2025-11-27 23:41:47 - redrun - INFO - <module>:460 - 所有账号处理完成
+2025-11-28 13:55:09 - redrun - INFO - <module>:414 - 使用硬编码测试用户数据
+2025-11-28 13:55:09 - redrun - INFO - preprocess_accounts:405 - 账号去重后数量: 2
+2025-11-28 13:55:09 - redrun - INFO - <module>:417 - 硬编码的账号数量: 2
+2025-11-28 13:55:09 - redrun - INFO - <module>:425 - 使用 2 个线程处理 2 个账号
+2025-11-28 13:55:10 - redrun - DEBUG - sign_up:79 - 账号 24405010422 开始报名环校跑
+2025-11-28 13:55:10 - redrun - INFO - sign_up:92 - 账号 24405010422 已经报名过环校跑
+2025-11-28 13:55:10 - redrun - DEBUG - sign_up:79 - 账号 24405010422 开始报名环校跑
+2025-11-28 13:55:10 - redrun - INFO - sign_up:92 - 账号 24405010422 已经报名过环校跑
+2025-11-28 13:55:10 - redrun - DEBUG - start:135 - 账号 24405010422 开始跑步请求: https://lb.hnfnu.edu.cn/school/challenges
+2025-11-28 13:55:10 - redrun - DEBUG - start:140 - 账号 24405010422 提交开始跑步请求
+2025-11-28 13:55:10 - redrun - INFO - start:160 - 账号 24405010422 开始跑步成功，challenge_id: 82c97ac3-5a0a-4697-bc56-f5375630a697
+2025-11-28 13:55:10 - redrun - DEBUG - wait_time:189 - 账号 24405010422 开始等待跑步时间，随机等待 1580 秒
+2025-11-28 13:55:10 - redrun - INFO - wait_time:204 - 24405010422 还需：26min
+2025-11-28 13:55:10 - redrun - DEBUG - wait_time:206 - 账号 24405010422 已等待 0 秒，剩余 26:20
+2025-11-28 13:55:10 - redrun - DEBUG - sign_up:79 - 账号 24405010421 开始报名环校跑
+2025-11-28 13:55:11 - redrun - INFO - sign_up:92 - 账号 24405010421 已经报名过环校跑
+2025-11-28 13:55:11 - redrun - DEBUG - sign_up:79 - 账号 24405010421 开始报名环校跑
+2025-11-28 13:55:11 - redrun - INFO - sign_up:92 - 账号 24405010421 已经报名过环校跑
+2025-11-28 13:55:11 - redrun - DEBUG - start:135 - 账号 24405010421 开始跑步请求: https://lb.hnfnu.edu.cn/school/challenges
+2025-11-28 13:55:11 - redrun - DEBUG - start:140 - 账号 24405010421 提交开始跑步请求
+2025-11-28 13:55:11 - redrun - INFO - start:160 - 账号 24405010421 开始跑步成功，challenge_id: 5c3d61ff-5c21-416e-a485-191cc8515087
+2025-11-28 13:55:11 - redrun - DEBUG - wait_time:189 - 账号 24405010421 开始等待跑步时间，随机等待 1682 秒
+2025-11-28 13:55:11 - redrun - INFO - wait_time:204 - 24405010421 还需：28min
+2025-11-28 13:55:11 - redrun - DEBUG - wait_time:206 - 账号 24405010421 已等待 0 秒，剩余 28:02
