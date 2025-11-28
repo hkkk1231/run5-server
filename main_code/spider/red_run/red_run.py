@@ -5,7 +5,6 @@ import time
 import requests
 import random
 import queue
-import argparse
 import json
 from concurrent.futures import ThreadPoolExecutor
 
@@ -389,14 +388,7 @@ def process_single_account(account, password, case):
     logout_wrapper(account)
 
 
-def parse_arguments():
-    """解析命令行参数"""
-    parser = argparse.ArgumentParser(description='红色跑处理程序')
-    parser.add_argument('--manual-inject', action='store_true', help='启用手动注入模式')
-    parser.add_argument('--test-data', type=str, default='[["24405010421", "24405010421"]]', 
-                       help='手动注入的测试数据，JSON格式，例如: \"[[\"账号1\", \"密码1\"], [\"账号2\", \"密码2\"]]\"')
-    parser.add_argument('--max-workers', type=int, default=5, help='最大线程数')
-    return parser.parse_args()
+
 
 def preprocess_accounts(accounts):
     """预处理账号数据，去重并确保每个账号只出现一次"""
@@ -414,51 +406,22 @@ def preprocess_accounts(accounts):
     return unique_accounts
 
 if __name__ == '__main__':
-    # 解析命令行参数
-    args = parse_arguments()
-    
     # 创建队列
     q = queue.Queue()
     
     try:
-        # 根据参数决定数据来源
-        if args.manual_inject:
-            logger.info("使用手动注入模式")
-            try:
-                # 解析测试数据
-                test_accounts = json.loads(args.test_data)
-                if not isinstance(test_accounts, list):
-                    raise ValueError("测试数据必须是列表格式")
-                
-                # 验证数据格式
-                for item in test_accounts:
-                    if not isinstance(item, list) or len(item) != 2:
-                        raise ValueError("每个账号数据必须是[账号, 密码]格式")
-                
-                accounts = preprocess_accounts(test_accounts)
-                logger.info(f"手动注入的账号数量: {len(accounts)}")
-                
-            except (json.JSONDecodeError, ValueError) as e:
-                logger.error(f"测试数据格式错误: {str(e)}")
-                exit(1)
-        else:
-            logger.info("使用正常模式")
-            # 获取需要红色跑的用户账号
-            accounts = safe_execute(
-                lambda: filter.get_red_run_users(),
-                default_return=[],
-                logger_name="redrun",
-                context={"operation": "get_red_run_users"}
-            )
-            accounts = preprocess_accounts(accounts)
-            logger.info(f"从表格获取到需要红色跑的用户数量: {len(accounts)}")
+        # 使用硬编码测试用户数据
+        logger.info("使用硬编码测试用户数据")
+        test_accounts = [["24405010421", "24405010421"], ["24405010422", "24405010422"]]
+        accounts = preprocess_accounts(test_accounts)
+        logger.info(f"硬编码的账号数量: {len(accounts)}")
         
         if not accounts:
             logger.info("没有需要处理的账号")
             exit()
         
         # 使用多线程处理多个账号
-        max_workers = min(args.max_workers, len(accounts))  # 最多使用指定线程数，避免过多并发
+        max_workers = min(5, len(accounts))  # 最多使用5个线程数，避免过多并发
         logger.info(f"使用 {max_workers} 个线程处理 {len(accounts)} 个账号")
         
         with ThreadPoolExecutor(max_workers=max_workers) as executor:
