@@ -6,7 +6,7 @@ This project automates HNFNU PE requirements, so contributions must keep scrapin
 - All runnable code lives in `main_code/`; `paths.py` exposes absolute `Path` objects and must be the single source for filesystem references.
 - Automation modules sit under `main_code/spider/`: `long_run/`, `red_run/`, and `study_online/` each contain entry scripts plus helpers; cross-cutting utilities reside in `spider/package/` (`auth`, `core`, `data`, `network`).
 - Shared assets live in `spider/resource/` (`data/` for Excel/JSON inputs, `config/` for UA pools, `logs/` for module logs); keep sensitive files out of commits when possible.
-- The only committed integration test today is `spider/red_run/test_signup.py`; mirror its placement when adding new targeted tests.
+- Currently there are no committed integration tests; when you add targeted tests, keep them beside the module they exercise (e.g., under `spider/red_run/`) and follow the existing log/fixture conventions.
 
 ## Build, Test, and Development Commands
 Run from `/root/desktop/run5-server/main_code`:
@@ -14,7 +14,6 @@ Run from `/root/desktop/run5-server/main_code`:
 python3 -m spider.long_run.long_run      # simulate daily 4 km runs
 python3 -m spider.red_run.red_run        # process red activity queue
 python3 -m spider.study_online.main      # orchestrate video + exam automation
-python3 spider/red_run/test_signup.py    # regression test for red-run enrollment
 ```
 Each script supports both `-m` execution and direct invocation via the built-in `sys.path` bootstrap; prefer the module form when integrating with tooling.
 
@@ -27,7 +26,7 @@ Each script supports both `-m` execution and direct invocation via the built-in 
 ## Testing Guidelines
 - Favor deterministic integration tests that hit staging accounts; store helpers beside the module they exercise.
 - Name test files `test_<feature>.py`, emit structured logs, and write outputs to the module-specific log file for later inspection.
-- Before opening a PR, execute the relevant module(s) plus any impacted tests (e.g., `python3 spider/red_run/test_signup.py`) and verify log files reflect expected success paths with no stack traces.
+- Before opening a PR, execute the relevant module(s) (long-run, red-run, study-online) and verify their log files reflect expected success paths with no stack traces; add/update targeted tests under the corresponding module if you introduce new scenarios.
 
 ## Commit & Pull Request Guidelines
 - Follow the existing history of short, present-tense summaries (often Chinese, e.g., “修复红色跑404错误”), and mention the affected module when possible.

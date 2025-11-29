@@ -16,7 +16,7 @@ if PROJECT_ROOT not in sys.path:
 from main_code.spider.package.network.get_headers import get_headers
 from main_code.spider.package.network.get_ip_port import get_ip_port
 from main_code.spider.package.data import filter
-from main_code.spider.package.query_spider import Query
+from main_code.spider.package.data.query_spider import Query
 from main_code.spider.package.auth.login import LoginConfig, create_authenticated_session
 from main_code.spider.package.auth.session_manager import session_manager
 # from main_code.spider.package.auth.error_manager import error_account_manager, ErrorType  # 已移除错误账号管理器

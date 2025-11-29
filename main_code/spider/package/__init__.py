@@ -7,4 +7,4 @@ from . import network
 from . import data
 from . import auth
 from . import core
-from . import query_spider
+from .data import query_spider

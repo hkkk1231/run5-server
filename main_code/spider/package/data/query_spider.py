@@ -15,10 +15,10 @@ if __name__ == "__main__":
     from main_code.spider.package.auth.login import create_authenticated_session, get_error_accounts
     from main_code.spider.package.auth.session_manager import session_manager
 else:
-    from .network.get_headers import get_headers
-    from .data.read_excel import extract_data
-    from .auth.login import create_authenticated_session, get_error_accounts
-    from .auth.session_manager import session_manager
+    from ..network.get_headers import get_headers
+    from .read_excel import extract_data
+    from ..auth.login import create_authenticated_session, get_error_accounts
+    from ..auth.session_manager import session_manager
 
 # 使用统一的绝对路径配置
 from paths import ACCOUNT_NAME_FILE, CURRENT_MILEAGE_FILE
@@ -74,11 +74,11 @@ class Query:
             print("跳过并记录")
             return False
 
-    def query_record(self, account, token=True):
-        # 添加token到请求头
-        self.session.headers.update({
-            "Authorization": f"Bearer {token}"
-        })
+    def query_record(self, account, token=None):
+        """查询账号跑步记录，token 为可选覆盖值"""
+        if isinstance(token, str) and token:
+            bearer_token = token if token.startswith("Bearer ") else f"Bearer {token}"
+            self.session.headers.update({"Authorization": bearer_token})
         # 请求记录页面url
         mileage_url = "https://lb.hnfnu.edu.cn/school/student/getMyLongMarchList"
         respond_json = self.session.get(mileage_url, headers=self.session.headers).json()
@@ -95,20 +95,16 @@ class Query:
             logging.info(f"姓名：{name}")
             self.update_json(account, name, str(ACCOUNT_NAME_FILE))
 
-        if token:
-            # 获取记录数据
-            mileages = [item["mileage"] for item in respond_json["rows"]]
-            mileages_sum = sum(mileages)
-            # 打印数据
-            # print(f"记录：{mileages}")
-            logging.info(f"当前里程：{round(mileages_sum, 2)}")
-            # 更新里程
-            self.update_json(account, mileages_sum, str(CURRENT_MILEAGE_FILE))
-            if not respond_json["rows"]:
-                return 0
-            else:
-                return mileages_sum
-        return None
+        # 获取记录数据
+        mileages = [item["mileage"] for item in respond_json["rows"]]
+        mileages_sum = sum(mileages)
+        logging.info(f"当前里程：{round(mileages_sum, 2)}")
+        # 更新里程
+        self.update_json(account, mileages_sum, str(CURRENT_MILEAGE_FILE))
+        if not respond_json["rows"]:
+            return 0
+        else:
+            return mileages_sum
 
     def logout(self):
         # 使用会话管理器退出登录
