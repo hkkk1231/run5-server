@@ -50,6 +50,7 @@ STUDY_STATUS_FILE = SPIDER_DATA_DIR / "study_status.json"
 EXAM_STATUS_FILE = SPIDER_DATA_DIR / "exam_status.json"
 CURRENT_MILEAGE_FILE = SPIDER_DATA_DIR / "current_mileage.json"
 ACCOUNT_NAME_FILE = SPIDER_DATA_DIR / "account_name.json"
+RED_RUN_COMPLETION_FILE = SPIDER_DATA_DIR / "redrun_complete.json"
 
 # 配置文件
 USER_AGENT_FILE = SPIDER_CONFIG_DIR / "user_agent.json"
@@ -64,6 +65,7 @@ VIDEO_LOG = SPIDER_LOGS_DIR / "video_log.txt"
 EXAM_LOG = SPIDER_LOGS_DIR / "exam_log.txt"
 COMPLETION_STATUS_LOG = SPIDER_LOGS_DIR / "completion_status_log.txt"
 VIDEO_EXAM_LOG = SPIDER_LOGS_DIR / "video_exam_log.txt"
+RED_RUN_LOG_FILE = SPIDER_LOGS_DIR / "redrun_log.txt"
 
 # ==============================================================================
 # 便捷函数 - 转换 Path 对象为字符串（兼容性）

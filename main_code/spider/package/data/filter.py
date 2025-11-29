@@ -9,7 +9,7 @@ import os
 import sys
 
 # 使用统一的绝对路径配置（无需动态推导）
-from paths import SPIDER_DATA_DIR
+from paths import SPIDER_DATA_DIR, RED_RUN_COMPLETION_FILE, CURRENT_MILEAGE_FILE
 
 # 使用相对导入读取 Excel 模块
 from . import read_excel
@@ -22,6 +22,22 @@ from datetime import datetime
 
 # 设置日志记录器
 logger = logging.getLogger(__name__)
+
+def load_completed_red_run_accounts():
+    if not RED_RUN_COMPLETION_FILE.exists():
+        return set()
+    try:
+        with RED_RUN_COMPLETION_FILE.open("r", encoding="utf-8") as file:
+            data = json.load(file)
+    except json.JSONDecodeError:
+        logger.warning("redrun_complete.json 格式异常，忽略已完成账号过滤")
+        return set()
+    accounts = set()
+    if isinstance(data, list):
+        for item in data:
+            if isinstance(item, dict) and item.get("account"):
+                accounts.add(str(item["account"]))
+    return accounts
 
 def today_json_name():
     today = datetime.now().strftime('%Y-%m-%d')
@@ -132,6 +148,7 @@ def get_long_run_users():
     return long_run_users
 
 def get_red_run_users():
+    completed_accounts = load_completed_red_run_accounts()
     # 修复：从Excel中读取红色竞赛用户数据
     # Excel列名：学号, 密码, 红色竞赛 (不是"是否需要红色跑")
     # 只有红色竞赛列值为1的用户才会被筛选出来
@@ -139,11 +156,12 @@ def get_red_run_users():
     red_run_users = []
 
     for account, info_list in all_data.items():
+        account_key = str(account)
         # 第三列是红色竞赛标记，只有值为1才表示需要参加红色跑
         need_red_run = int(info_list[2] or 0)
-        if need_red_run == 1:
+        if need_red_run == 1 and account_key not in completed_accounts:
             password = info_list[1] if info_list[1] else account
-            red_run_users.append([account, password])
+            red_run_users.append([account_key, str(password)])
             # 使用模块级别的logger
             logging.debug(f"找到红色跑用户: {account}")
 
