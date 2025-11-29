@@ -125,7 +125,7 @@ if __name__ == '__main__':
     # 创建队列
     q = queue.Queue()
     # 获取数据
-    account_passwords = read_excel.extract_account_password()
+    account_passwords = [["24406030235","24406030235"]]
     for account_password in account_passwords:
         q.put(account_password)
 
