@@ -10,18 +10,19 @@ import os
 import sys
 from datetime import datetime
 from typing import Dict, Any
+from pathlib import Path
 
-# 统一使用绝对导入，基于项目根目录的现代pathlib方式
-# 项目根目录：run5-server
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
+# 统一使用 main_code 作为导入根目录，兼容直接运行和 -m 方式
+CURRENT_FILE = Path(__file__).resolve()
+MAIN_CODE_DIR = CURRENT_FILE.parents[2]  # .../main_code
+if str(MAIN_CODE_DIR) not in sys.path:
+    sys.path.insert(0, str(MAIN_CODE_DIR))
 
 # 使用统一的绝对路径配置
 from paths import STUDY_STATUS_FILE, EXAM_STATUS_FILE, COMPLETION_STATUS_LOG
 
 # 统一导入：所有模块都使用绝对导入
-from main_code.spider.package.core.common_utils import setup_logger
+from spider.package.core.common_utils import setup_logger
 
 # 设置日志
 logger = setup_logger("completion_status", str(COMPLETION_STATUS_LOG))

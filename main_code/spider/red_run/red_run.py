@@ -5,12 +5,20 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from threading import Lock
+from pathlib import Path
+import sys
 
 import requests
 
-from main_code.spider.package.core.common_utils import setup_logger
-from main_code.spider.package.data.filter import get_red_run_users
-from main_code.spider.package.network import get_headers
+# 统一使用 main_code 作为导入根目录，兼容直接运行和 -m 方式
+CURRENT_FILE = Path(__file__).resolve()
+MAIN_CODE_DIR = CURRENT_FILE.parents[2]  # .../main_code
+if str(MAIN_CODE_DIR) not in sys.path:
+    sys.path.insert(0, str(MAIN_CODE_DIR))
+
+from spider.package.core.common_utils import setup_logger
+from spider.package.data.filter import get_red_run_users
+from spider.package.network import get_headers
 from paths import RED_RUN_COMPLETION_FILE, RED_RUN_LOG_FILE, ensure_dir
 
 # 配置日志与记录文件路径
