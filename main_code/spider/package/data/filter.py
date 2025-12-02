@@ -147,12 +147,12 @@ def get_long_run_users():
 
     return long_run_users
 
-def get_red_run_users():
+def get_red_run_users_with_path():
     completed_accounts = load_completed_red_run_accounts()
     # 修复：从Excel中读取红色竞赛用户数据
     # Excel列名：学号, 密码, 红色竞赛 (不是"是否需要红色跑")
     # 只有红色竞赛列值为1的用户才会被筛选出来
-    all_data = read_excel.extract_data(["学号", "密码", "红色竞赛"])
+    all_data = read_excel.extract_data(["学号", "密码", "红色竞赛", "途径"])
     red_run_users = []
 
     for account, info_list in all_data.items():
@@ -161,11 +161,20 @@ def get_red_run_users():
         need_red_run = int(info_list[2] or 0)
         if need_red_run == 1 and account_key not in completed_accounts:
             password = info_list[1] if info_list[1] else account
-            red_run_users.append([account_key, str(password)])
+            path_value = info_list[3]
+            red_run_users.append([account_key, str(password), path_value])
             # 使用模块级别的logger
-            logging.debug(f"找到红色跑用户: {account}")
+            logging.debug(f"找到红色跑用户: {account}，途径: {path_value}")
 
     return red_run_users
+
+
+def get_red_run_users():
+    """
+    向后兼容的简化版本，仅返回账号和密码。
+    """
+    users_with_path = get_red_run_users_with_path()
+    return [[account, password] for account, password, _ in users_with_path]
 
 def filter_data(html_content):
     """
