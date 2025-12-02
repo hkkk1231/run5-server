@@ -3,17 +3,19 @@ import logging
 import json
 import time
 import os
+from pathlib import Path
 
 # 兼容性处理：支持直接运行和模块导入
 if __name__ == "__main__":
     import sys
-    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
-    if project_root not in sys.path:
-        sys.path.insert(0, project_root)
-    from main_code.spider.package.network.get_headers import get_headers
-    from main_code.spider.package.data.read_excel import extract_data
-    from main_code.spider.package.auth.login import create_authenticated_session, get_error_accounts
-    from main_code.spider.package.auth.session_manager import session_manager
+    current_file = Path(__file__).resolve()
+    main_code_dir = current_file.parents[3]  # .../main_code
+    if str(main_code_dir) not in sys.path:
+        sys.path.insert(0, str(main_code_dir))
+    from spider.package.network.get_headers import get_headers
+    from spider.package.data.read_excel import extract_data
+    from spider.package.auth.login import create_authenticated_session, get_error_accounts
+    from spider.package.auth.session_manager import session_manager
 else:
     from ..network.get_headers import get_headers
     from .read_excel import extract_data

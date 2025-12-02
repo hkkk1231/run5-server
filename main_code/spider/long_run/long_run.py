@@ -5,26 +5,26 @@ import datetime
 import time
 import random
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 
-# 统一使用绝对导入，基于项目根目录的现代pathlib方式
-# 项目根目录：run5-server
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
-
-# 统一导入：所有模块都使用绝对导入
-from main_code.spider.package.network.get_headers import get_headers
-from main_code.spider.package.network.get_ip_port import get_ip_port
-from main_code.spider.package.data import filter
-from main_code.spider.package.data.query_spider import Query
-from main_code.spider.package.auth.login import LoginConfig, create_authenticated_session
-from main_code.spider.package.auth.session_manager import session_manager
-# from main_code.spider.package.auth.error_manager import error_account_manager, ErrorType  # 已移除错误账号管理器
-from main_code.spider.package.core.common_utils import setup_logger, setup_root_logger
-from main_code.spider.long_run.fake_key import encrypt_timestamp
+# 统一使用 main_code 作为导入根目录，兼容直接运行和 -m 方式
+CURRENT_FILE = Path(__file__).resolve()
+MAIN_CODE_DIR = CURRENT_FILE.parents[2]  # .../main_code
+if str(MAIN_CODE_DIR) not in sys.path:
+    sys.path.insert(0, str(MAIN_CODE_DIR))
 
 # 统一的路径配置
 from paths import SPIDER_LOGS_DIR
+
+# 统一导入：所有模块都使用绝对导入（以 spider 为顶级包）
+from spider.package.network.get_headers import get_headers
+from spider.package.network.get_ip_port import get_ip_port
+from spider.package.data import filter
+from spider.package.data.query_spider import Query
+from spider.package.auth.login import LoginConfig, create_authenticated_session
+from spider.package.auth.session_manager import session_manager
+from spider.package.core.common_utils import setup_logger, setup_root_logger
+from spider.long_run.fake_key import encrypt_timestamp
 
 # 配置 longrun 专用 logger（不需要配置根日志器，避免重复打印）
 logger = setup_logger("longrun", str(SPIDER_LOGS_DIR / "longrun_log.txt"))
