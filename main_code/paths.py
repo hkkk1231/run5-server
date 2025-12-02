@@ -52,6 +52,7 @@ CURRENT_MILEAGE_FILE = SPIDER_DATA_DIR / "current_mileage.json"
 ACCOUNT_NAME_FILE = SPIDER_DATA_DIR / "account_name.json"
 RED_RUN_COMPLETION_FILE = SPIDER_DATA_DIR / "redrun_complete.json"
 RED_RUN_ERROR_PASSWORD_FILE = SPIDER_DATA_DIR / "red_error_password.json"
+RANK_RECORD_DIR = SPIDER_DATA_DIR / "rank_record"
 
 # 配置文件
 USER_AGENT_FILE = SPIDER_CONFIG_DIR / "user_agent.json"
