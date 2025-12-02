@@ -19,13 +19,20 @@ if str(MAIN_CODE_DIR) not in sys.path:
 from spider.package.core.common_utils import setup_logger
 from spider.package.data.filter import get_red_run_users
 from spider.package.network import get_headers
-from paths import RED_RUN_COMPLETION_FILE, RED_RUN_LOG_FILE, ensure_dir
+from paths import (
+    RED_RUN_COMPLETION_FILE,
+    RED_RUN_ERROR_PASSWORD_FILE,
+    RED_RUN_LOG_FILE,
+    ensure_dir,
+)
 
 # 配置日志与记录文件路径
 ensure_dir(RED_RUN_LOG_FILE.parent)
 ensure_dir(RED_RUN_COMPLETION_FILE.parent)
+ensure_dir(RED_RUN_ERROR_PASSWORD_FILE.parent)
 logger = setup_logger("redrun", str(RED_RUN_LOG_FILE))
 _COMPLETION_FILE_LOCK = Lock()
+_ERROR_PASSWORD_FILE_LOCK = Lock()
 
 
 def _load_completion_records():
@@ -82,6 +89,53 @@ def record_completion(account, password, session, run_time):
     _append_completion_record(record)
     logger.info(f"{account} 已记录完成信息")
 
+
+def _load_error_passwords():
+    """读取密码错误账号记录，返回 {account: {password, error_time}}"""
+    if not RED_RUN_ERROR_PASSWORD_FILE.exists():
+        try:
+            RED_RUN_ERROR_PASSWORD_FILE.write_text("{}", encoding="utf-8")
+        except OSError as exc:
+            logger.error(f"初始化 red_error_password.json 失败：{exc}")
+        return {}
+
+    try:
+        with RED_RUN_ERROR_PASSWORD_FILE.open("r", encoding="utf-8") as file:
+            data = json.load(file)
+            if isinstance(data, dict):
+                return data
+    except json.JSONDecodeError:
+        logger.warning("red_error_password.json 格式异常，已重置")
+        try:
+            RED_RUN_ERROR_PASSWORD_FILE.write_text("{}", encoding="utf-8")
+        except OSError as exc:
+            logger.error(f"重置 red_error_password.json 失败：{exc}")
+    except OSError as exc:
+        logger.error(f"读取 red_error_password.json 失败：{exc}")
+    return {}
+
+
+def _save_error_passwords(data):
+    """保存密码错误账号记录"""
+    try:
+        with RED_RUN_ERROR_PASSWORD_FILE.open("w", encoding="utf-8") as file:
+            json.dump(data, file, ensure_ascii=False, indent=2)
+    except OSError as exc:
+        logger.error(f"写入 red_error_password.json 失败：{exc}")
+
+
+def mark_error_password(account, password):
+    """记录密码错误账号到 red_error_password.json"""
+    error_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with _ERROR_PASSWORD_FILE_LOCK:
+        records = _load_error_passwords()
+        records[str(account)] = {
+            "password": str(password),
+            "error_time": error_time,
+        }
+        _save_error_passwords(records)
+    logger.info(f"{account} 已记录为密码错误账号")
+
 def login(session, username, inner_password):
     # 登录url
     login_url = "https://lb.hnfnu.edu.cn/login"
@@ -106,6 +160,7 @@ def login(session, username, inner_password):
     msg = payload.get("msg")
     if msg == "用户不存在/密码错误":
         logger.info(f"{username} 的密码错误")
+        mark_error_password(username, inner_password)
         return False
     return payload.get("token")
 
@@ -245,8 +300,21 @@ if __name__ == '__main__':
     # 创建队列
     q = queue.Queue()
     # 获取数据
-    # account_passwords = [["24404010309","24404010309"]]
     account_passwords = get_red_run_users()
+    # 读取并跳过历史密码错误账号
+    error_password_records = _load_error_passwords()
+    if error_password_records:
+        before_filter_count = len(account_passwords)
+        account_passwords = [
+            (account, password)
+            for account, password in account_passwords
+            if str(account) not in error_password_records
+        ]
+        skipped_count = before_filter_count - len(account_passwords)
+        if skipped_count > 0:
+            print(f"已根据 red_error_password.json 跳过 {skipped_count} 个密码错误账号")
+            logger.info(f"已根据 red_error_password.json 跳过 {skipped_count} 个密码错误账号")
+
     if not account_passwords:
         print("未从 red_run 过滤中获取到学号数据")
     else:
