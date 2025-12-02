@@ -2,23 +2,24 @@ import requests
 import os
 import sys
 import logging
+from pathlib import Path
 
-# 统一使用绝对导入，基于项目根目录的现代pathlib方式
-# 项目根目录：run5-server
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))))
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
+# 统一使用 main_code 作为导入根目录，兼容直接运行和 -m 方式
+CURRENT_FILE = Path(__file__).resolve()
+MAIN_CODE_DIR = CURRENT_FILE.parents[2]  # .../main_code
+if str(MAIN_CODE_DIR) not in sys.path:
+    sys.path.insert(0, str(MAIN_CODE_DIR))
 
 # 使用统一的绝对路径配置
 from paths import VIDEO_LOG
 
-# 统一导入：所有模块都使用绝对导入
-from main_code.spider.package.network.get_headers import get_headers
-from main_code.spider.package.data import filter
-from main_code.spider.package.auth.login import create_authenticated_session
-from main_code.spider.package.auth.session_manager import session_manager
-from main_code.spider.package.core.common_utils import AutoLoginBase, authenticated_operation, setup_logger
-from main_code.spider.package.core.error_handler import retry_on_exception, safe_execute, auth_error_handler
+# 统一导入：所有模块都使用绝对导入（以 spider 为顶级包）
+from spider.package.network.get_headers import get_headers
+from spider.package.data import filter
+from spider.package.auth.login import create_authenticated_session
+from spider.package.auth.session_manager import session_manager
+from spider.package.core.common_utils import AutoLoginBase, authenticated_operation, setup_logger
+from spider.package.core.error_handler import retry_on_exception, safe_execute, auth_error_handler
 
 # 设置日志
 logger = setup_logger('video', str(VIDEO_LOG))
