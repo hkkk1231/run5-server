@@ -19,7 +19,7 @@ if str(MAIN_CODE_DIR) not in sys.path:
     sys.path.insert(0, str(MAIN_CODE_DIR))
 
 from spider.package.core.common_utils import setup_logger
-from spider.package.data.filter import get_red_run_users
+from spider.package.data.filter import get_red_run_users_with_path
 from spider.package.network import get_headers
 from paths import (
     RED_RUN_COMPLETION_FILE,
@@ -549,8 +549,40 @@ if __name__ == '__main__':
     print("脚本开始运行...")
     # 创建队列
     q = queue.Queue()
-    # 获取数据
-    account_passwords = get_red_run_users()
+    # 获取数据（包含途径字段）
+    account_password_path_list = get_red_run_users_with_path()
+
+    # 基于当前时间和途径字段过滤需要跳过的账号
+    now = datetime.now()
+    current_minutes = now.hour * 60 + now.minute
+    in_skip_window = 18 * 60 + 30 <= current_minutes <= 21 * 60 + 30
+
+    skipped_due_to_path_and_time: List[Tuple[str, str]] = []
+    account_passwords: List[Tuple[str, str]] = []
+
+    for item in account_password_path_list:
+        # 兼容性处理：如果没有途径字段，则按原逻辑只取前两个元素
+        if len(item) >= 3:
+            account, password, path = item[0], item[1], item[2]
+        else:
+            account, password = item[0], item[1]
+            path = None
+
+        if in_skip_window and path == "追逐":
+            skipped_due_to_path_and_time.append((str(account), str(password)))
+            continue
+
+        account_passwords.append((str(account), str(password)))
+
+    if skipped_due_to_path_and_time:
+        skipped_accounts_str = ", ".join(acc for acc, _ in skipped_due_to_path_and_time)
+        msg = (
+            f"当前时间 {now.strftime('%H:%M')} 处于 18:30-21:30，"
+            f"根据途径字段为“追逐”跳过以下账号：{skipped_accounts_str}"
+        )
+        print(msg)
+        logger.info(msg)
+
     # 读取并跳过历史密码错误账号
     error_password_records = _load_error_passwords()
     if error_password_records:
@@ -571,7 +603,7 @@ if __name__ == '__main__':
         print(f"已获取 {len(account_passwords)} 位红色跑用户")
     for account_password in account_passwords:
         q.put(account_password)
-    
+
     print(f"队列中有 {q.qsize()} 个任务")
     print("开始批次执行...")
     main(q)
