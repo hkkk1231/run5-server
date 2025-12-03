@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from threading import Lock
-from typing import Callable, List, Optional, Tuple
+from typing import Callable, Dict, List, Optional, Tuple
 import sys
 
 import requests
@@ -35,6 +35,9 @@ ensure_dir(RED_RUN_ERROR_PASSWORD_FILE.parent)
 logger = setup_logger("redrun", str(RED_RUN_LOG_FILE))
 _COMPLETION_FILE_LOCK = Lock()
 _ERROR_PASSWORD_FILE_LOCK = Lock()
+
+# 账号 -> 红竞期望分数（原始值，可为 None / 空字符串 / 数字 / 字符串）
+EXPECTED_SCORE_BY_ACCOUNT: Dict[str, object] = {}
 
 
 @dataclass
@@ -369,14 +372,42 @@ def start(session: requests.Session,
 
 def wait_time(account: str,
               update_status: Optional[Callable[..., None]] = None,
-              mintime: int = 1551,
-              maxtime: int = 1682) -> int:
+              mintime: Optional[int] = None,
+              maxtime: Optional[int] = None) -> int:
     """
     等待模拟跑步时长。
     - 不再向日志中高频写入倒计时信息；
     - 通过 update_status 回调更新面板上的耗时和进度。
     """
-    seconds = random.randint(mintime, maxtime)
+    # 如果显式指定了时间范围，优先使用传入的范围（兼容旧用法）
+    if mintime is not None and maxtime is not None:
+        min_seconds, max_seconds = mintime, maxtime
+    else:
+        # 根据“红竞期望分数”决定当前账号的时间范围
+        raw_score = EXPECTED_SCORE_BY_ACCOUNT.get(str(account))
+        score: Optional[int]
+        if raw_score in (None, ""):
+            score = None
+        else:
+            try:
+                score = int(raw_score)  # 支持字符串 / 数字
+            except (TypeError, ValueError):
+                score = None
+
+        if score == 100:
+            # 1450-1550
+            min_seconds, max_seconds = 1450, 1550
+        elif score == 90:
+            # 1580-1620
+            min_seconds, max_seconds = 1580, 1620
+        elif score == 70:
+            # 2000-2250
+            min_seconds, max_seconds = 2000, 2250
+        else:
+            # 字段为空或为其他值时，使用默认时间：1581-1630
+            min_seconds, max_seconds = 1581, 1630
+
+    seconds = random.randint(min_seconds, max_seconds)
     start_time = time.time()
     if update_status:
         update_status(status="跑步中", elapsed=0, progress=0.2)
@@ -547,6 +578,8 @@ def main(q: queue.Queue,
 
 if __name__ == '__main__':
     print("脚本开始运行...")
+    # 重置账号期望分数映射（避免多次运行残留旧数据）
+    EXPECTED_SCORE_BY_ACCOUNT.clear()
     # 创建队列
     q = queue.Queue()
     # 获取数据（包含途径字段）
@@ -561,18 +594,21 @@ if __name__ == '__main__':
     account_passwords: List[Tuple[str, str]] = []
 
     for item in account_password_path_list:
-        # 兼容性处理：如果没有途径字段，则按原逻辑只取前两个元素
-        if len(item) >= 3:
-            account, password, path = item[0], item[1], item[2]
-        else:
-            account, password = item[0], item[1]
-            path = None
+        # 兼容性处理：如果没有途径/期望分数字段，则按原逻辑只取前两个元素
+        account = item[0]
+        password = item[1] if len(item) >= 2 else item[0]
+        path = item[2] if len(item) >= 3 else None
+        expected_score = item[3] if len(item) >= 4 else None
+
+        account_str = str(account)
+        # 记录账号对应的“红竞期望分数”，供 wait_time 使用
+        EXPECTED_SCORE_BY_ACCOUNT[account_str] = expected_score
 
         if in_skip_window and path == "追逐":
-            skipped_due_to_path_and_time.append((str(account), str(password)))
+            skipped_due_to_path_and_time.append((account_str, str(password)))
             continue
 
-        account_passwords.append((str(account), str(password)))
+        account_passwords.append((account_str, str(password)))
 
     if skipped_due_to_path_and_time:
         skipped_accounts_str = ", ".join(acc for acc, _ in skipped_due_to_path_and_time)

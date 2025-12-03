@@ -85,10 +85,30 @@ def add_one(json_id, filepath=today_json_name()):
             json.dump(json_list, f)
 
 def get_current_mileage_json():
-    # 使用统一的路径配置
-    with open(str(CURRENT_MILEAGE_FILE), 'r') as f:
-        json_dic = json.load(f)
-        return json_dic
+    """
+    从 current_mileage.json 读取当前里程数据。
+    为避免因文件不存在/解析失败导致流程中断，这里做容错处理：
+    - 文件不存在、JSON 格式错误或 IO 异常时，返回空字典并记录告警日志。
+    """
+    try:
+        if not CURRENT_MILEAGE_FILE.exists():
+            logger.warning("current_mileage.json 不存在，将视为没有历史里程数据")
+            return {}
+
+        with CURRENT_MILEAGE_FILE.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        if not isinstance(data, dict):
+            logger.warning("current_mileage.json 内容格式异常，期望为字典，将忽略历史里程数据")
+            return {}
+
+        return data
+    except json.JSONDecodeError:
+        logger.warning("current_mileage.json 解析失败，将忽略历史里程数据")
+        return {}
+    except OSError as e:
+        logger.warning(f"读取 current_mileage.json 出错，将忽略历史里程数据: {e}")
+        return {}
 
 def odd_even_separate(data):
     day_parity = datetime.now().day % 2
@@ -152,7 +172,8 @@ def get_red_run_users_with_path():
     # 修复：从Excel中读取红色竞赛用户数据
     # Excel列名：学号, 密码, 红色竞赛 (不是"是否需要红色跑")
     # 只有红色竞赛列值为1的用户才会被筛选出来
-    all_data = read_excel.extract_data(["学号", "密码", "红色竞赛", "途径"])
+    # 同时读取“红竞期望分数”，用于后续控制跑步时间
+    all_data = read_excel.extract_data(["学号", "密码", "红色竞赛", "途径", "红竞期望分数"])
     red_run_users = []
 
     for account, info_list in all_data.items():
@@ -162,9 +183,10 @@ def get_red_run_users_with_path():
         if need_red_run == 1 and account_key not in completed_accounts:
             password = info_list[1] if info_list[1] else account
             path_value = info_list[3]
-            red_run_users.append([account_key, str(password), path_value])
+            expected_score = info_list[4]
+            red_run_users.append([account_key, str(password), path_value, expected_score])
             # 使用模块级别的logger
-            logging.debug(f"找到红色跑用户: {account}，途径: {path_value}")
+            logging.debug(f"找到红色跑用户: {account}，途径: {path_value}，红竞期望分数: {expected_score}")
 
     return red_run_users
 
@@ -174,7 +196,8 @@ def get_red_run_users():
     向后兼容的简化版本，仅返回账号和密码。
     """
     users_with_path = get_red_run_users_with_path()
-    return [[account, password] for account, password, _ in users_with_path]
+    # 兼容新增的“红竞期望分数”等字段，只取前两个元素
+    return [[item[0], item[1]] for item in users_with_path]
 
 def filter_data(html_content):
     """
@@ -256,7 +279,19 @@ def filter_data(html_content):
 
 
 def main():
-    data_before = read_excel.extract_data(["学号", "密码", "长征跑", "手动停止", "目标里程", "<4", "当前里程"])
+    """
+    根据 Excel 配置和当前里程筛选需要执行长征跑的用户。
+
+    当前里程优先从 current_mileage.json 读取，避免依赖可能未及时刷新的表格数据；
+    如 JSON 文件缺失或未包含该账号，则回退使用表格中的“当前里程”列。
+    """
+    # 先从 JSON 读取当前里程数据（容错版本）
+    current_mileage_map = get_current_mileage_json()
+
+    # 仍从 Excel 读取其他配置字段，“当前里程”仅作为回退使用
+    data_before = read_excel.extract_data(
+        ["学号", "密码", "长征跑", "手动停止", "目标里程", "<4", "当前里程"]
+    )
     filtered_result = {}
 
     for account, info_list in data_before.items():
@@ -267,10 +302,24 @@ def main():
         target = int(info_list[4] or 0)
         less_4km = int(info_list[5] or 0)
 
-        if info_list[6] in ('None', None, ''):
+        # 优先使用 JSON 中的当前里程
+        current_value = current_mileage_map.get(account)
+
+        # 如果 JSON 中没有该账号或值为空，则回退到 Excel 里的“当前里程”列
+        if current_value in ("None", None, ""):
+            excel_current = info_list[6]
+            if excel_current not in ("None", None, ""):
+                current_value = excel_current
+
+        # 统一做一次安全的数值转换，保持和旧逻辑一致使用整数比较
+        if current_value in ("None", None, ""):
             current = 0
         else:
-            current = int(info_list[6] or 0)
+            try:
+                current = int(current_value or 0)
+            except (TypeError, ValueError):
+                logger.warning(f"账号 {account} 的当前里程值异常（{current_value}），按 0 处理")
+                current = 0
 
         if int(need_long) == 1 and int(stop_run) == 0 and account not in today_ran_list and current < target:
             filtered_result[account] = [password, current, less_4km]
