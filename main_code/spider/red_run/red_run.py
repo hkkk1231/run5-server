@@ -510,7 +510,7 @@ def process_account(account: str,
 
 def main(q: queue.Queue,
          case: str = "报名加跑步",
-         batch_size: int = 5) -> None:
+         batch_size: int = 15) -> None:
     # 预先计算总批次数，用于面板标题展示
     try:
         total_tasks = q.qsize()
