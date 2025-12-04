@@ -213,6 +213,6 @@ def process_single_account(username, password):
 
 # 测试代码
 if __name__ == "__main__":
-    #accounts = vedio_exam.extract_excel()
-    accounts = [["24418080145", "24418080145"]]
+    accounts = vedio_exam.extract_excel()
+    #accounts = [["24418080145", "24418080145"]]
     main(accounts)

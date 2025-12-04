@@ -5,6 +5,7 @@
 
 import logging
 import functools
+import time
 from typing import Callable, Any, Optional, Dict, List
 # from ..auth.login import create_authenticated_session, LoginConfig  # 延迟导入以避免循环依赖
 from ..auth.session_manager import session_manager
@@ -156,20 +157,28 @@ class BaseOperation:
     def login(self) -> bool:
         """
         执行登录操作
-        
+
         Returns:
             登录成功返回True，失败返回False
         """
         # 创建认证会话
         # 延迟导入以避免循环依赖
         from ..auth.login import create_authenticated_session
+
         session = create_authenticated_session(self.username, self.password)
         if not session:
             self.logger.info(f"账号 {self.username} 登录失败")
             # 移除错误账号记录逻辑，只记录日志
             self.logger.error(f"账号 {self.username} 登录失败")
             return False
-            
+
+        # 将会话注册到会话管理器中，供 authenticated_operation / session_required 使用
+        session_manager._active_sessions[self.username] = session
+        auth_header = session.headers.get("Authorization", "")
+        token = auth_header.replace("Bearer ", "") if auth_header else ""
+        session_manager._session_tokens[self.username] = token
+        session_manager._session_last_used[self.username] = time.time()
+
         self.logger.info(f"账号 {self.username} 登录成功")
         return True
         

@@ -3,6 +3,7 @@ import json
 import os
 import sys
 import logging
+import ast
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -111,7 +112,8 @@ def match_exam_by_questions(
 
 class AutoLogin(AutoLoginBase):
     def __init__(self, username, password):
-        super().__init__(username, password, logger)
+        # 这里传入的是日志名称字符串，而不是 logger 对象
+        super().__init__(username, password, logger.name)
 
     @retry_on_exception(max_retries=3, logger_name='exam')
     @authenticated_operation
@@ -166,7 +168,7 @@ class AutoLogin(AutoLoginBase):
         data = safe_execute(
             lambda: self.get_question(),
             default_return={"data": []},
-            logger=logger,
+            logger_name=logger.name,
             error_handler=auth_error_handler,
             context={"username": self.username, "operation": "get_question"}
         )
@@ -251,9 +253,22 @@ class AutoLogin(AutoLoginBase):
         session.headers.update({"Content-Type": "application/json"})
         logger.debug(f"提交答案的请求头为：{session.headers}")
         response = session.put(url=submit_url, data=data, headers=headers)
-        logger.debug(f"提交答案数据响应: {response.json()}")
+
+        try:
+            response_json = response.json()
+        except ValueError as e:
+            logger.error(f"提交答案数据响应解析失败: {e}", exc_info=True)
+            return None
+
+        logger.debug(f"提交答案数据响应: {response_json}")
+
+        # 仅在服务端明确返回成功时才认为提交成功
+        if response_json.get("code") != 200:
+            logger.error(f"提交考试答案失败，服务端返回: {response_json}")
+            return None
+
         logger.info("答案提交成功")
-        return response.json()
+        return response_json
 
     # 这里是直接用抓包得到的答案，区别于从题目中提取答案
     def get_answer_data(self):
@@ -279,14 +294,35 @@ class AutoLogin(AutoLoginBase):
 
         try:
             with open(answer_file_path, "r", encoding="utf-8") as f:
-                put_answer = f.read()
-            return put_answer
+                raw_content = f.read()
         except FileNotFoundError:
             logger.error(f"答案文件不存在: {answer_file_path}")
+            return None
         except Exception as e:
             logger.error(f"读取答案文件失败: {answer_file_path}，错误：{e}", exc_info=True)
+            return None
 
-        return None
+        # 优先尝试作为标准 JSON 使用
+        try:
+            json.loads(raw_content)
+            return raw_content
+        except json.JSONDecodeError:
+            pass
+
+        # 兼容当前使用单引号/字典字符串格式的答案文件：
+        # 先用 ast.literal_eval 解析为字典，再序列化为合法 JSON 字符串
+        try:
+            submission_obj = ast.literal_eval(raw_content)
+        except Exception as e:
+            logger.error(f"答案文件内容格式不正确: {answer_file_path}，错误：{e}", exc_info=True)
+            return None
+
+        try:
+            json_str = json.dumps(submission_obj, ensure_ascii=False)
+            return json_str
+        except Exception as e:
+            logger.error(f"答案数据序列化为 JSON 失败: {answer_file_path}，错误：{e}", exc_info=True)
+            return None
 
     def logout(self):
         # 使用会话管理器退出登录
@@ -340,7 +376,7 @@ def main(accounts=None):
         accounts = safe_execute(
             lambda: filter.get_exam_users(),
             default_return=[],
-            logger=logger,
+            logger_name=logger.name,
             context={"operation": "get_exam_users"}
         )
         logger.info(f"获取到 {len(accounts)} 个需要考试的用户")
@@ -354,7 +390,7 @@ def main(accounts=None):
             # 使用安全执行函数处理每个账号
             safe_execute(
                 lambda: process_single_account(account),
-                logger=logger,
+                logger_name=logger.name,
                 error_handler=auth_error_handler,
                 context={"username": account[0], "operation": "process_exam_account"}
             )
@@ -380,44 +416,53 @@ def process_single_account(account):
         need_exam = safe_execute(
             lambda: auto_login.get_exam_score(username),
             default_return=False,
-            logger=logger,
+            logger_name=logger.name,
             error_handler=auth_error_handler,
             context={"username": username, "operation": "get_exam_score"}
         )
-        
+
         if need_exam:
             logger.info("开始提交考试答案")
             # 使用安全执行函数提交答案
             result = safe_execute(
                 lambda: auto_login.submit_answer_data(),
-                logger=logger,
+                logger_name=logger.name,
                 error_handler=auth_error_handler,
                 context={"username": username, "operation": "submit_answer"}
             )
-            
+
             if result:
-                logger.info(f"答案提交成功")
-                
+                logger.info("答案提交请求已成功发送，开始获取最新分数")
+
                 # 提交成功后再次获取分数并更新考试状态
                 session = session_manager.get_session(username)
                 score_url = "https://lb.hnfnu.edu.cn/school/student/getKaoShi"
                 score_response = safe_execute(
                     lambda: session.get(url=score_url).json(),
                     default_return={"data": {"kaoShi": 0}},
-                    logger=logger,
+                    logger_name=logger.name,
                     error_handler=auth_error_handler,
                     context={"username": username, "operation": "get_final_score"}
                 )
-                
-                exam_score = score_response["data"]["kaoShi"]
-                
-                # 更新考试状态和分数
-                safe_execute(
-                    lambda: completion_status.update_exam_status(username, True, exam_score),
-                    logger=logger,
-                    context={"username": username, "operation": "update_exam_status"}
-                )
-                logger.info(f"已更新用户 {username} 的考试状态为已完成，分数：{exam_score}")
+
+                exam_score = score_response["data"].get("kaoShi", 0)
+
+                if isinstance(exam_score, (int, float)) and exam_score > 0:
+                    # 仅在分数大于 0 时标记为已完成
+                    safe_execute(
+                        lambda: completion_status.update_exam_status(username, True, int(exam_score)),
+                        logger_name=logger.name,
+                        context={"username": username, "operation": "update_exam_status"}
+                    )
+                    logger.info(f"已更新用户 {username} 的考试状态为已完成，分数：{exam_score}")
+                else:
+                    logger.warning(f"提交考试答案后，分数仍为 {exam_score}，视为未完成，允许后续返工")
+                    # 记录一次未完成的尝试，completed 置为 False，score 保留便于排查
+                    safe_execute(
+                        lambda: completion_status.update_exam_status(username, False, int(exam_score)),
+                        logger_name=logger.name,
+                        context={"username": username, "operation": "update_exam_status_failed"}
+                    )
         else:
             logger.info("已有考试分数，跳过")
     else:

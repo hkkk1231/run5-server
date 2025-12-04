@@ -177,15 +177,21 @@ def is_exam_completed(username: str) -> bool:
     """
     status_data = get_exam_status()
     user_status = status_data.get(username, {})
-    
-    # 检查completed字段
-    if "completed" in user_status:
-        return user_status["completed"]
-    
-    # 兼容旧格式：如果有date字段但没有completed字段，认为已完成
+
+    completed = user_status.get("completed")
+    score = user_status.get("score")
+
+    # 如果显式记录了 completed，优先按 completed 判断
+    if completed is not None:
+        # 逻辑修正：如果标记为已完成但分数为 0，则视为未完成，允许后续返工
+        if completed and isinstance(score, (int, float)) and score <= 0:
+            return False
+        return bool(completed)
+
+    # 兼容旧格式：如果有 date 字段但没有 completed 字段，认为已完成
     if "date" in user_status and "completed" not in user_status:
         return True
-    
+
     return False
 
 

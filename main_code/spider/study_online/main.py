@@ -82,6 +82,4 @@ def video_and_exam():
 
 
 if __name__ == '__main__':
-    pass
-    #25级的考试没弄，先别用以免意外
-    #video_and_exam()
+    video_and_exam()
