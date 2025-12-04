@@ -2,6 +2,7 @@ import openpyxl
 import os
 import re
 import json
+from datetime import datetime, date
 from openpyxl.styles import Alignment, NamedStyle
 
 # 使用统一的绝对路径配置
@@ -196,7 +197,7 @@ def process_excel_file(input_path, output_path):
         new_worksheet.cell(row=row_idx, column=current_mileage_col_idx).style = text_style
         new_worksheet.cell(row=row_idx, column=current_mileage_col_idx).alignment = Alignment(horizontal='center')
     
-    # 最后统一处理学号、密码和时间列的格式，全部转为文本格式
+    # 最后统一处理学号、密码和时间列的格式
     # 获取各列的索引
     headers = [cell.value for cell in new_worksheet[1]]
     student_id_col_idx = headers.index("学号") + 1
@@ -221,14 +222,41 @@ def process_excel_file(input_path, output_path):
             cell.style = text_style
             cell.alignment = Alignment(horizontal='center')
     
-    # 统一设置时间列为文本格式
+    # 统一设置时间列为日期格式（mm-dd）
     for row_idx in range(2, max_row + 1):
         cell = new_worksheet.cell(row=row_idx, column=time_col_idx)
-        if cell.value is not None:
-            # 确保时间是文本格式，无论原始格式如何
-            cell.value = str(cell.value)
-            cell.style = text_style
-            cell.alignment = Alignment(horizontal='center')
+        raw_value = cell.value
+
+        if raw_value is None or raw_value == "":
+            continue
+
+        # 如果已经是日期/日期时间类型，只需设置显示格式
+        if isinstance(raw_value, (datetime, date)):
+            cell.number_format = "mm-dd"
+            cell.alignment = Alignment(horizontal="center")
+            continue
+
+        text = str(raw_value).strip()
+
+        # 优先处理形如 mm.dd 的数字/文本，例如 9.1、09.01 等
+        try:
+            parts = text.split(".")
+            if len(parts) == 2:
+                month = int(parts[0])
+                day = int(parts[1])
+                year = datetime.now().year
+                cell.value = datetime(year, month, day)
+                cell.number_format = "mm-dd"
+                cell.alignment = Alignment(horizontal="center")
+                continue
+        except Exception:
+            # 解析失败时退回到纯文本处理
+            pass
+
+        # 无法按 mm.dd 解析时，作为文本写入并替换为 mm-dd 形式
+        cell.value = text.replace(".", "-")
+        cell.style = text_style
+        cell.alignment = Alignment(horizontal="center")
     
     # 保存新文件
     new_workbook.save(output_path)
