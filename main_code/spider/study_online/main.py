@@ -23,27 +23,26 @@ logger = setup_logger("video_exam", str(VIDEO_EXAM_LOG))
 def video_and_exam():
     """根据Excel中的线上学习和考试状态执行相应任务，并管理完成状态"""
     logger.info("开始视频观看和考试脚本")
-    
+
     # 获取需要线上学习和考试的用户数据
     users_data = filter.get_online_learning_and_exam_users()
     #users_data = {'24407010326': {'password': '24407010326', 'need_online_learning': False, 'need_exam': True}}
 
-    
     # 根据完成状态过滤用户
     filtered_users = completion_status.filter_users_by_status(users_data)
-    
+
     if not filtered_users:
         logger.info("没有需要处理的用户")
         return
-    
+
     logger.info(f"共 {len(filtered_users)} 个用户需要处理")
-    
+
     for username, user_info in filtered_users.items():
         password = user_info['password']
         account = [username, password]
-        
+
         logger.info(f"处理账号: {username}")
-        
+
         # 处理线上学习
         if user_info['need_online_learning'] and not completion_status.is_study_completed(username):
             logger.info(f"开始视频观看: {username}")
@@ -63,7 +62,7 @@ def video_and_exam():
             logger.info(f"学习任务已完成: {username}")
         else:
             logger.debug(f"不需要线上学习: {username}")
-        
+
         # 处理考试
         if user_info['need_exam']:
             logger.info(f"开始考试: {username}")
@@ -78,7 +77,7 @@ def video_and_exam():
                 logger.debug(f"考试任务异常详情: {str(e)}", exc_info=True)
                 # 更新考试状态为未完成
                 completion_status.update_exam_status(username, False)
-    
+
     logger.info("所有任务完成")
 
 

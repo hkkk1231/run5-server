@@ -4,6 +4,7 @@ import os
 import sys
 import logging
 from pathlib import Path
+from typing import Dict, List, Optional, Tuple
 
 # 统一使用 main_code 作为导入根目录，兼容直接运行和 -m 方式
 CURRENT_FILE = Path(__file__).resolve()
@@ -12,7 +13,13 @@ if str(MAIN_CODE_DIR) not in sys.path:
     sys.path.insert(0, str(MAIN_CODE_DIR))
 
 # 使用统一的绝对路径配置
-from paths import EXAM_LOG, SPIDER_DATA_DIR
+from paths import (
+    EXAM_LOG,
+    EXAM_2025_24_QUESTIONS_FILE,
+    EXAM_2025_24_ANSWERS_FILE,
+    EXAM_2025_25_QUESTIONS_FILE,
+    EXAM_2025_25_ANSWERS_FILE,
+)
 
 # 统一导入：所有模块都使用绝对导入（以 spider 为顶级包）
 from spider.package.network.get_headers import get_headers
@@ -25,6 +32,81 @@ from spider.package.core.error_handler import retry_on_exception, safe_execute, 
 
 # 设置日志
 logger = setup_logger('exam', str(EXAM_LOG))
+
+
+LOCAL_EXAM_CONFIGS: List[Dict[str, object]] = [
+    {
+        "name": "24级上册",
+        "question_file": EXAM_2025_24_QUESTIONS_FILE,
+        "answer_file": EXAM_2025_24_ANSWERS_FILE,
+    },
+    {
+        "name": "25级上册",
+        "question_file": EXAM_2025_25_QUESTIONS_FILE,
+        "answer_file": EXAM_2025_25_ANSWERS_FILE,
+    },
+]
+
+
+def _normalize_question_list(question_response: Dict[str, object]) -> List[Dict[str, object]]:
+    """
+    将题目列表规范化为可比较的结构，仅保留用于匹配的关键字段。
+    """
+    if not isinstance(question_response, dict):
+        return []
+
+    data_list = question_response.get("data") or []
+    normalized: List[Dict[str, object]] = []
+
+    for item in data_list:
+        if not isinstance(item, dict):
+            continue
+        normalized.append(
+            {
+                "topicId": item.get("topicId"),
+                "topicType": item.get("topicType"),
+                "topicContent": item.get("topicContent"),
+                "a": item.get("a"),
+                "b": item.get("b"),
+                "c": item.get("c"),
+                "d": item.get("d"),
+            }
+        )
+
+    return normalized
+
+
+def match_exam_by_questions(
+    current_question_response: Dict[str, object],
+) -> Tuple[Optional[Path], Optional[str]]:
+    """
+    根据当前获取到的题目，与本地抓包题目进行匹配，返回对应的答案文件路径和年级名称。
+    """
+    current_normalized = _normalize_question_list(current_question_response)
+    if not current_normalized:
+        return None, None
+
+    for config in LOCAL_EXAM_CONFIGS:
+        question_file: Path = config["question_file"]  # type: ignore[assignment]
+
+        try:
+            with open(question_file, "r", encoding="utf-8") as f:
+                local_question_response = json.load(f)
+        except FileNotFoundError:
+            logger.warning(f"本地题目文件不存在: {question_file}")
+            continue
+        except json.JSONDecodeError:
+            logger.error(f"本地题目文件 JSON 格式错误: {question_file}")
+            continue
+
+        local_normalized = _normalize_question_list(local_question_response)
+        if current_normalized == local_normalized:
+            exam_name: str = config["name"]  # type: ignore[assignment]
+            answer_file: Path = config["answer_file"]  # type: ignore[assignment]
+            logger.info(f"当前考试题目匹配到本地模板：{exam_name}")
+            return answer_file, exam_name
+
+    return None, None
 
 
 class AutoLogin(AutoLoginBase):
@@ -160,6 +242,9 @@ class AutoLogin(AutoLoginBase):
         headers = session.headers
         # 获取符合提交格式的答案
         data = self.get_answer_data()
+        if not data:
+            logger.warning("未获取到答案数据，本次不提交考试答案")
+            return None
         # 确保请求头中包含Authorization
         headers.update(session.headers)
         # 提交答案
@@ -172,12 +257,36 @@ class AutoLogin(AutoLoginBase):
 
     # 这里是直接用抓包得到的答案，区别于从题目中提取答案
     def get_answer_data(self):
-        # 使用绝对路径获取答案文件路径
-        answer_file_path = str(SPIDER_DATA_DIR / "立正.txt")
+        """
+        根据当前账号获取到的题目，与本地抓包题目进行比对，自动选择对应年级的答案数据。
+        如果未匹配到任何本地试卷，则返回 None。
+        """
+        question_data = safe_execute(
+            lambda: self.get_question(),
+            default_return={"data": []},
+            logger_name=logger.name,
+            error_handler=auth_error_handler,
+            context={"username": self.username, "operation": "get_question_for_answer_match"}
+        )
 
-        with open(answer_file_path, "r", encoding="utf-8") as f:
-            put_answer = f.read()
-        return put_answer
+        answer_file_path, exam_name = match_exam_by_questions(question_data)
+
+        if not answer_file_path:
+            logger.warning("未检测到本地有该用户本次考试答案")
+            return None
+
+        logger.info(f"检测到用户 {self.username} 当前考试为：{exam_name}，使用答案文件：{answer_file_path}")
+
+        try:
+            with open(answer_file_path, "r", encoding="utf-8") as f:
+                put_answer = f.read()
+            return put_answer
+        except FileNotFoundError:
+            logger.error(f"答案文件不存在: {answer_file_path}")
+        except Exception as e:
+            logger.error(f"读取答案文件失败: {answer_file_path}，错误：{e}", exc_info=True)
+
+        return None
 
     def logout(self):
         # 使用会话管理器退出登录

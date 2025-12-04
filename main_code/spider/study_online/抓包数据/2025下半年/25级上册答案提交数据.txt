@@ -1,0 +1,254 @@
+{
+    "topics": [
+        {
+            "answer": "康德",
+            "str": "康德",
+            "topicId": 66,
+            "name": "a"
+        },
+        {
+            "answer": "维生素B2",
+            "str": "维生素B2",
+            "topicId": 67,
+            "name": "b"
+        },
+        {
+            "answer": "2008年",
+            "str": "2008年",
+            "topicId": 68,
+            "name": "c"
+        },
+        {
+            "answer": "每四年",
+            "str": "每四年",
+            "topicId": 69,
+            "name": "d"
+        },
+        {
+            "answer": "英国",
+            "str": "英国",
+            "topicId": 70,
+            "name": "c"
+        },
+        {
+            "answer": "50-70ML",
+            "str": "50-70ML",
+            "topicId": 71,
+            "name": "c"
+        },
+        {
+            "answer": "朗格朗",
+            "str": "朗格朗",
+            "topicId": 72,
+            "name": "b"
+        },
+        {
+            "answer": "10%",
+            "str": "10%",
+            "topicId": 73,
+            "name": "b"
+        },
+        {
+            "answer": "重点训练坐立姿势,保证骨盆、脊柱的正常发育。",
+            "str": "重点训练坐立姿势,保证骨盆、脊柱的正常发育。",
+            "topicId": 74,
+            "name": "d"
+        },
+        {
+            "answer": "1894年",
+            "str": "1894年",
+            "topicId": 75,
+            "name": "b"
+        },
+        {
+            "answer": "巴赫",
+            "str": "巴赫",
+            "topicId": 76,
+            "name": "a"
+        },
+        {
+            "answer": "各就位 鸣枪",
+            "str": "各就位 鸣枪",
+            "topicId": 77,
+            "name": "d"
+        },
+        {
+            "answer": "1891",
+            "str": "1891",
+            "topicId": 78,
+            "name": "c"
+        },
+        {
+            "answer": "10-20min",
+            "str": "10-20min",
+            "topicId": 79,
+            "name": "c"
+        },
+        {
+            "answer": "60度",
+            "str": "60度",
+            "topicId": 80,
+            "name": "c"
+        },
+        {
+            "answer": "跨越式",
+            "str": "跨越式",
+            "topicId": 81,
+            "name": "c"
+        },
+        {
+            "answer": "扣篮",
+            "str": "扣篮",
+            "topicId": 82,
+            "name": "d"
+        },
+        {
+            "answer": "摆动",
+            "str": "摆动",
+            "topicId": 83,
+            "name": "c"
+        },
+        {
+            "answer": "76cm",
+            "str": "76cm",
+            "topicId": 84,
+            "name": "b"
+        },
+        {
+            "answer": "单数,左发球区",
+            "str": "单数,左发球区",
+            "topicId": 85,
+            "name": "c"
+        },
+        {
+            "answer": "平抽发球",
+            "str": "平抽发球",
+            "topicId": 86,
+            "name": "d"
+        },
+        {
+            "answer": "腹痛时多喝水并补充葡萄糖口服液",
+            "str": "腹痛时多喝水并补充葡萄糖口服液",
+            "topicId": 87,
+            "name": "a"
+        },
+        {
+            "answer": "两步上篮",
+            "str": "两步上篮",
+            "topicId": 88,
+            "name": "c"
+        },
+        {
+            "answer": "“一二一二”",
+            "str": "“一二一二”",
+            "topicId": 89,
+            "name": "a"
+        },
+        {
+            "answer": "队列移动动作",
+            "str": "队列移动动作",
+            "topicId": 90,
+            "name": "a"
+        },
+        {
+            "topicId": 91,
+            "str": "更快~更高~更强"
+        },
+        {
+            "topicId": 92,
+            "str": "思想麻痹大意~运动前准备活动不充分~内容组合不科学.方法不合理~运动场因素"
+        },
+        {
+            "topicId": 93,
+            "str": "运动性昏厥~肌肉痉挛~极点和第二次呼吸~运动中暑"
+        },
+        {
+            "topicId": 94,
+            "str": "协调~平衡~和谐"
+        },
+        {
+            "topicId": 95,
+            "str": "提高防身自卫能力~培养道德情操的教育作用~娱乐观赏.丰富文化生活"
+        },
+        {
+            "topicId": 96,
+            "str": "直拍握法~横拍握法"
+        },
+        {
+            "topicId": 97,
+            "str": "护腕~护膝~护踝~护肘"
+        },
+        {
+            "topicId": 98,
+            "str": "锻炼方式~运动强度~频率~持续时间"
+        },
+        {
+            "topicId": 99,
+            "str": "集合,解散~看齐,报数~踏步,立定~立正,稍息"
+        },
+        {
+            "topicId": 100,
+            "str": "增加骨骼长度和骨皮质厚度~增加瘦体重,改变体成分~提高肺容量和肺活量~调节和稳定神经系统和内分泌系统的功能"
+        },
+        {
+            "answer": "错误",
+            "str": "错误",
+            "topicId": 101,
+            "name": "b"
+        },
+        {
+            "answer": "正确",
+            "str": "正确",
+            "topicId": 102,
+            "name": "a"
+        },
+        {
+            "answer": "正确",
+            "str": "正确",
+            "topicId": 103,
+            "name": "a"
+        },
+        {
+            "answer": "正确",
+            "str": "正确",
+            "topicId": 104,
+            "name": "a"
+        },
+        {
+            "answer": "错误",
+            "str": "错误",
+            "topicId": 105,
+            "name": "b"
+        },
+        {
+            "answer": "错误",
+            "str": "错误",
+            "topicId": 106,
+            "name": "b"
+        },
+        {
+            "answer": "正确",
+            "str": "正确",
+            "topicId": 107,
+            "name": "a"
+        },
+        {
+            "answer": "错误",
+            "str": "错误",
+            "topicId": 108,
+            "name": "b"
+        },
+        {
+            "answer": "错误",
+            "str": "错误",
+            "topicId": 109,
+            "name": "b"
+        },
+        {
+            "answer": "正确",
+            "str": "正确",
+            "topicId": 110,
+            "name": "a"
+        }
+    ]
+}
