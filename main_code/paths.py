@@ -68,6 +68,7 @@ EXAM_LOG = SPIDER_LOGS_DIR / "exam_log.txt"
 COMPLETION_STATUS_LOG = SPIDER_LOGS_DIR / "completion_status_log.txt"
 VIDEO_EXAM_LOG = SPIDER_LOGS_DIR / "video_exam_log.txt"
 RED_RUN_LOG_FILE = SPIDER_LOGS_DIR / "redrun_log.txt"
+EMAIL_TEST_LOG = SPIDER_LOGS_DIR / "email_test_log.txt"
 
 # ==============================================================================
 # 便捷函数 - 转换 Path 对象为字符串（兼容性）
