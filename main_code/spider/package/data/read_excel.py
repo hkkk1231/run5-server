@@ -5,6 +5,7 @@ import os
 
 # 使用统一的绝对路径配置
 from paths import EXCEL_FILE
+from .update_excel_for_computer import ensure_excel_for_computer_updated
 
 # ---------- 获取字段到列索引的映射 ----------
 def get_field_to_column_mapping(file_path: str) -> Dict[str, int]:
@@ -40,6 +41,9 @@ def extract_data(fields=None, default_rules=None):
     返回:
         以学号为键，字段值列表为值的字典
     """
+    # 每次读取前，先确保供程序使用的 Excel 文件已经根据原始文件更新（包括时间字段格式）
+    ensure_excel_for_computer_updated()
+
     # 使用绝对路径
     file_path = str(EXCEL_FILE)
     

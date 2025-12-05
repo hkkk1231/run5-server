@@ -6,7 +6,7 @@ from datetime import datetime, date
 from openpyxl.styles import Alignment, NamedStyle
 
 # 使用统一的绝对路径配置
-from paths import CURRENT_MILEAGE_FILE, SPIDER_DATA_DIR
+from paths import CURRENT_MILEAGE_FILE, EXCEL_SOURCE_FILE, EXCEL_FILE
 
 def extract_numeric_value(text):
     """
@@ -222,7 +222,7 @@ def process_excel_file(input_path, output_path):
             cell.style = text_style
             cell.alignment = Alignment(horizontal='center')
     
-    # 统一设置时间列为日期格式（mm-dd）
+    # 统一设置时间列为日期格式（m-d）
     for row_idx in range(2, max_row + 1):
         cell = new_worksheet.cell(row=row_idx, column=time_col_idx)
         raw_value = cell.value
@@ -232,7 +232,7 @@ def process_excel_file(input_path, output_path):
 
         # 如果已经是日期/日期时间类型，只需设置显示格式
         if isinstance(raw_value, (datetime, date)):
-            cell.number_format = "mm-dd"
+            cell.number_format = "m-d"
             cell.alignment = Alignment(horizontal="center")
             continue
 
@@ -246,7 +246,7 @@ def process_excel_file(input_path, output_path):
                 day = int(parts[1])
                 year = datetime.now().year
                 cell.value = datetime(year, month, day)
-                cell.number_format = "mm-dd"
+                cell.number_format = "m-d"
                 cell.alignment = Alignment(horizontal="center")
                 continue
         except Exception:
@@ -257,15 +257,28 @@ def process_excel_file(input_path, output_path):
         cell.value = text.replace(".", "-")
         cell.style = text_style
         cell.alignment = Alignment(horizontal="center")
-    
+
     # 保存新文件
     new_workbook.save(output_path)
-    print(f"处理完成，结果已保存")
+
+
+def ensure_excel_for_computer_updated() -> None:
+    """
+    确保供程序使用的 Excel 文件已根据原始文件生成/更新。
+    - 源文件不存在时静默返回，不中断主流程；
+    - 当源文件比目标文件新或目标文件不存在时，重新生成。
+    """
+    input_file = EXCEL_SOURCE_FILE
+    output_file = EXCEL_FILE
+
+    if not input_file.exists():
+        return
+
+    if (not output_file.exists()
+            or input_file.stat().st_mtime > output_file.stat().st_mtime):
+        process_excel_file(str(input_file), str(output_file))
+
 
 if __name__ == "__main__":
-    # 输入和输出文件路径
-    input_file = str(SPIDER_DATA_DIR / "2025.9.1.xlsx")
-    output_file = str(SPIDER_DATA_DIR / "2025.9.1_for_computer.xlsx")
-
-    # 处理Excel文件
-    process_excel_file(input_file, output_file)
+    ensure_excel_for_computer_updated()
+    print("处理完成，结果已保存")
