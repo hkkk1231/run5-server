@@ -47,10 +47,13 @@ def video_and_exam():
         if user_info['need_online_learning'] and not completion_status.is_study_completed(username):
             logger.info(f"开始视频观看: {username}")
             try:
-                video_spider.main([account])
-                # 更新学习状态为已完成
-                completion_status.update_study_status(username, True)
-                logger.info(f"学习任务完成: {username}")
+                video_results = video_spider.main([account])
+                video_success = bool(video_results.get(username))
+                completion_status.update_study_status(username, video_success)
+                if video_success:
+                    logger.info(f"学习任务完成: {username}")
+                else:
+                    logger.warning(f"学习任务未完成: {username}")
             except Exception as e:
                 # 控制台只显示简短信息
                 logger.warning(f"学习任务失败: {username}")

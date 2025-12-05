@@ -205,19 +205,63 @@ def filter_users_by_status(users_data: Dict[str, Any]) -> Dict[str, Any]:
     Returns:
         过滤后的用户数据
     """
-    filtered_users = {}
+    filtered_users: Dict[str, Any] = {}
+    study_status_map = get_study_status()
+    exam_status_map = get_exam_status()
+
+    def _study_completed(record: Dict[str, Any]) -> bool:
+        if not record:
+            return False
+        if "completed" in record:
+            return bool(record["completed"])
+        if "date" in record:
+            return True
+        return False
+
+    def _exam_completed(record: Dict[str, Any]) -> bool:
+        if not record:
+            return False
+        completed = record.get("completed")
+        score = record.get("score")
+
+        if completed is not None:
+            if completed and isinstance(score, (int, float)) and score <= 0:
+                return False
+            return bool(completed)
+
+        if "date" in record:
+            return True
+        return False
     
     for username, user_info in users_data.items():
-        # 检查学习状态
-        need_study = user_info.get('need_online_learning', False)
-        study_completed = is_study_completed(username)
-        
-        # 检查考试状态
-        need_exam = user_info.get('need_exam', False)
-        exam_completed = is_exam_completed(username)
+        study_record = study_status_map.get(username, {})
+        exam_record = exam_status_map.get(username, {})
+
+        study_completed = _study_completed(study_record)
+        exam_completed = _exam_completed(exam_record)
+
+        study_marked_incomplete = study_record.get("completed") is False
+
+        exam_marked_incomplete = False
+        if "completed" in exam_record:
+            exam_marked_incomplete = exam_record.get("completed") is False
+        score = exam_record.get("score")
+        if exam_record.get("completed") and isinstance(score, (int, float)) and score <= 0:
+            exam_marked_incomplete = True
+            exam_completed = False
+
+        need_study_flag = bool(user_info.get('need_online_learning', False))
+        need_exam_flag = bool(user_info.get('need_exam', False))
+
+        effective_need_study = need_study_flag or study_marked_incomplete
+        effective_need_exam = need_exam_flag or exam_marked_incomplete
+
+        # 更新用户信息供后续逻辑使用（例如 main.py 中的判断）
+        user_info['need_online_learning'] = effective_need_study
+        user_info['need_exam'] = effective_need_exam
         
         # 如果需要学习但未完成，或需要考试但未完成，则保留该用户
-        if (need_study and not study_completed) or (need_exam and not exam_completed):
+        if (effective_need_study and not study_completed) or (effective_need_exam and not exam_completed):
             filtered_users[username] = user_info
     
     return filtered_users

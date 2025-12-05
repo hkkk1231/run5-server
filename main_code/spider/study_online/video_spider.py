@@ -1,7 +1,4 @@
-import requests
-import os
 import sys
-import logging
 from pathlib import Path
 
 # 统一使用 main_code 作为导入根目录，兼容直接运行和 -m 方式
@@ -14,9 +11,7 @@ if str(MAIN_CODE_DIR) not in sys.path:
 from paths import VIDEO_LOG
 
 # 统一导入：所有模块都使用绝对导入（以 spider 为顶级包）
-from spider.package.network.get_headers import get_headers
 from spider.package.data import filter
-from spider.package.auth.login import create_authenticated_session
 from spider.package.auth.session_manager import session_manager
 from spider.package.core.common_utils import AutoLoginBase, authenticated_operation, setup_logger
 from spider.package.core.error_handler import retry_on_exception, safe_execute, auth_error_handler
@@ -25,11 +20,10 @@ from spider.package.core.error_handler import retry_on_exception, safe_execute, 
 logger = setup_logger('video', str(VIDEO_LOG))
 
 
-
-
 class AutoLogin(AutoLoginBase):
     def __init__(self, username, password):
-        super().__init__(username, password, logger)
+        # 传递日志名称字符串给基类，避免 getLogger 收到 logger 对象
+        super().__init__(username, password, logger.name)
 
     @retry_on_exception(max_retries=3, logger_name='video')
     @authenticated_operation
@@ -110,7 +104,7 @@ class AutoLogin(AutoLoginBase):
         chapter_list = safe_execute(
             lambda: self.get_chapter_list(),
             default_return={"data": []},
-            logger=logger,
+            logger_name=logger.name,
             error_handler=auth_error_handler,
             context={"username": self.username, "operation": "get_chapter_list"}
         )
@@ -119,47 +113,73 @@ class AutoLogin(AutoLoginBase):
             logger.error(f"无法获取章节列表，跳过用户 {self.username}")
             return False
             
-        all_videos_completed = True  # 初始化一个标志变量，假设所有视频都已完成
         processed_videos = 0  # 记录处理的视频数量
+        pending_files = []
 
-        for chapter in chapter_list["data"]:
-            for file_info in chapter["scChapterFileList"]:
-                video_name = chapter["chapterName"]
+        for chapter in chapter_list.get("data", []):
+            files = chapter.get("scChapterFileList") or []
+            video_name = chapter.get("chapterName", "")
+            for file_info in files:
                 logger.debug(f"file_info: {file_info}")
-                if file_info["state"] != "1":
-                    file_id = file_info["fileId"]  # 获取视频名称，如果没有则为 None
-                    logger.info(f"处理视频：{video_name}")
-                    logger.debug(f"处理视频: fileId={file_id}, videoName={video_name}")
-                    
-                    # 使用安全执行函数提交状态
-                    safe_execute(
-                        lambda: self.submit_status(student_number, file_id),
-                        logger=logger,
-                        error_handler=auth_error_handler,
-                        context={"username": self.username, "operation": "submit_status"}
-                    )
-                    
-                    # 使用安全执行函数提交视频数据
-                    safe_execute(
-                        lambda: self.submit_video_data(student_number),
-                        logger=logger,
-                        error_handler=auth_error_handler,
-                        context={"username": self.username, "operation": "submit_video_data"}
-                    )
-                    
-                    all_videos_completed = False  # 有视频需要处理，说明不是全部完成
-                    processed_videos += 1  # 增加处理计数
+                if file_info.get("state") != "1":
+                    pending_files.append((video_name, file_info))
 
-                else:
-                    logger.debug(f"视频已完成：{video_name}")
-
-        # 根据标志变量的值决定返回结果
-        if all_videos_completed:
+        if not pending_files:
             logger.debug(f"学号 {student_number} 的学习任务已完成")
             return True
-        else:
-            logger.info(f"学号 {student_number} 处理了 {processed_videos} 个视频")
+
+        for video_name, file_info in pending_files:
+            file_id = file_info.get("fileId")
+            if not file_id:
+                logger.warning(f"视频 {video_name} 缺少 fileId，跳过")
+                continue
+
+            logger.info(f"处理视频：{video_name}")
+            logger.debug(f"处理视频: fileId={file_id}, videoName={video_name}")
+            
+            # 使用安全执行函数提交状态
+            safe_execute(
+                lambda fid=file_id: self.submit_status(student_number, fid),
+                logger_name=logger.name,
+                error_handler=auth_error_handler,
+                context={"username": self.username, "operation": "submit_status"}
+            )
+            
+            # 使用安全执行函数提交视频数据
+            safe_execute(
+                lambda: self.submit_video_data(student_number),
+                logger_name=logger.name,
+                error_handler=auth_error_handler,
+                context={"username": self.username, "operation": "submit_video_data"}
+            )
+            processed_videos += 1
+
+        logger.info(f"学号 {student_number} 已尝试处理 {processed_videos} 个视频，开始校验结果")
+        refreshed_list = safe_execute(
+            lambda: self.get_chapter_list(),
+            default_return={"data": []},
+            logger_name=logger.name,
+            error_handler=auth_error_handler,
+            context={"username": self.username, "operation": "refresh_chapter_list"}
+        )
+
+        if not refreshed_list or "data" not in refreshed_list:
+            logger.warning(f"无法在处理后确认学习结果，学号 {student_number} 视为未完成")
             return False
+
+        remaining = [
+            file_info
+            for chapter in refreshed_list.get("data", [])
+            for file_info in (chapter.get("scChapterFileList") or [])
+            if file_info.get("state") != "1"
+        ]
+
+        if remaining:
+            logger.warning(f"学号 {student_number} 仍有 {len(remaining)} 个视频未完成")
+            return False
+
+        logger.info(f"学号 {student_number} 视频任务已全部完成")
+        return True
 
     def logout(self):
         # 使用会话管理器退出登录
@@ -168,51 +188,66 @@ class AutoLogin(AutoLoginBase):
         logger.debug("退出登录")
 
 def main(accounts=None):
+    """启动视频学习任务，返回每个账号的完成状态。"""
+    results = {}
+
     # 如果没有提供账号列表，则使用过滤函数获取需要视频学习的用户
     if accounts is None:
         accounts = safe_execute(
             lambda: filter.get_video_users(),
             default_return=[],
-            logger=logger,
+            logger_name=logger.name,
             context={"operation": "get_video_users"}
         )
         logger.info(f"获取到 {len(accounts)} 个需要视频学习的用户")
     
-    for account in accounts:
-        username, password = account
-        # 添加账号分隔符
-        logger.info("=" * 60)
-        logger.info(f"账号：{username}")
-        
-        # 使用安全执行函数处理每个账号
-        safe_execute(
-            lambda: process_single_account(username, password),
-            logger=logger,
-            error_handler=auth_error_handler,
-            context={"username": username, "operation": "process_account"}
-        )
-        
-        # 添加账号处理完成分隔符
-        logger.info("=" * 60)
-        
-    logger.info("所有账号处理完成")
-    # 清理所有会话
-    session_manager.cleanup_all_sessions()
+    try:
+        for account in accounts:
+            username, password = account
+            # 添加账号分隔符
+            logger.info("=" * 60)
+            logger.info(f"账号：{username}")
+            
+            # 使用安全执行函数处理每个账号
+            result = safe_execute(
+                lambda u=username, p=password: process_single_account(u, p),
+                default_return=False,
+                logger_name=logger.name,
+                error_handler=auth_error_handler,
+                context={"username": username, "operation": "process_account"}
+            )
+            results[username] = bool(result)
+            
+            # 添加账号处理完成分隔符
+            logger.info("=" * 60)
+    finally:
+        logger.info("所有账号处理完成")
+        # 清理所有会话
+        session_manager.cleanup_all_sessions()
+
+    return results
 
 
 def process_single_account(username, password):
     """处理单个账号的视频学习"""
     auto_login = AutoLogin(username, password)
     token = auto_login.login()
-    if token:
-        if auto_login.process_videos(username):
-            logger.info("视频观看完成")
+    if not token:
+        logger.warning(f"{username} 登录失败，跳过视频任务")
+        auto_login.logout()
+        return False
+
+    try:
+        completed = auto_login.process_videos(username)
+        if completed:
+            logger.info("视频观看任务确认完成")
         else:
-            logger.info("视频已全部观看")
-    auto_login.logout()
+            logger.warning("视频学习未全部完成，将在下次重试")
+        return completed
+    finally:
+        auto_login.logout()
+
 
 # 测试代码
 if __name__ == "__main__":
-    accounts = vedio_exam.extract_excel()
-    #accounts = [["24418080145", "24418080145"]]
-    main(accounts)
+    main()
