@@ -38,7 +38,6 @@ _ERROR_PASSWORD_FILE_LOCK = Lock()
 
 # 账号 -> 红竞期望分数（原始值，可为 None / 空字符串 / 数字 / 字符串）
 EXPECTED_SCORE_BY_ACCOUNT: Dict[str, object] = {}
-ALREADY_SIGNED_KEYWORDS = ("重复报名", "已报名", "已经报名", "无需再次报名")
 
 
 @dataclass
@@ -311,58 +310,22 @@ def login(session: requests.Session,
 
 
 def sign_up(session: requests.Session,
-            update_status: Optional[Callable[..., None]] = None) -> bool:
-    """报名环校跑，验证成功响应，否则按要求重试；已报名视作成功。"""
+            update_status: Optional[Callable[..., None]] = None) -> None:
+    # 请求报名页面url
     sign_url = "https://lb.hnfnu.edu.cn/school/competition"
     data = {"competitionId": 38, "competitionName": "环校跑"}
-    max_attempts = 10
-    skip_threshold = 10
-    retry_delay = 1
-    last_error = ""
-
-    attempts = 0
-    for attempt in range(1, max_attempts + 1):
-        attempts = attempt
-        try:
-            if update_status:
-                update_status(status=f"报名中（第{attempt}次）")
-            response = session.post(json=data, url=sign_url, headers=session.headers, timeout=10)
-            response.raise_for_status()
-            payload = response.json()
-        except requests.RequestException as exc:
-            last_error = f"网络异常：{exc}"
-            logger.warning(f"报名环校跑失败（第{attempt}次）：{exc}")
-        except ValueError:
-            last_error = "响应解析失败"
-            logger.warning("报名环校跑失败：响应解析失败")
-        else:
-            msg = payload.get("msg")
-            code = payload.get("code")
-            logger.debug(f"报名响应：{payload}")
-            if msg == "参赛成功" and code == 200:
-                if update_status:
-                    update_status(status="报名完成", progress=0.15)
-                return True
-            if msg and any(keyword in str(msg) for keyword in ALREADY_SIGNED_KEYWORDS):
-                logger.info(f"报名接口提示已报名：{msg}，视为成功跳过重复操作")
-                if update_status:
-                    update_status(status="已报名", progress=0.15)
-                return True
-            last_error = f"响应异常 msg={msg} code={code}"
-            logger.warning(
-                f"报名环校跑失败（第{attempt}次）：期望 msg=参赛成功, code=200，实际 {payload}"
-            )
-
-        if attempt < max_attempts:
-            time.sleep(retry_delay)
-
-    if update_status:
-        update_status(status="报名失败", result="failed")
-    if last_error:
-        logger.error(f"报名环校跑最终失败：{last_error}")
-    if attempts >= skip_threshold:
-        logger.warning("报名失败次数超过5次，本次执行跳过该账号")
-    return False
+    try:
+        if update_status:
+            update_status(status="报名中")
+        session.post(json=data, url=sign_url, headers=session.headers, timeout=10)
+        logger.debug("报名请求已发送")
+    except requests.RequestException as exc:
+        logger.warning(f"报名环校跑失败：{exc}")
+        if update_status:
+            update_status(status="报名失败", result="failed")
+    else:
+        if update_status:
+            update_status(status="报名完成", progress=0.15)
 
 
 def start(session: requests.Session,
@@ -530,8 +493,7 @@ def process_account(account: str,
             return
 
         session.headers.update({"Authorization": f"Bearer {login_token}"})
-        if not sign_up(session, update_status=update_status):
-            return
+        sign_up(session, update_status=update_status)
 
         if case == "报名加跑步":
             challenge_id = start(session, account, update_status=update_status)
