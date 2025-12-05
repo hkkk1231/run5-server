@@ -15,6 +15,7 @@ from spider.package.data import filter
 from spider.package.auth.session_manager import session_manager
 from spider.package.core.common_utils import AutoLoginBase, authenticated_operation, setup_logger
 from spider.package.core.error_handler import retry_on_exception, safe_execute, auth_error_handler
+from spider.study_online import completion_status
 
 # 设置日志
 logger = setup_logger('video', str(VIDEO_LOG))
@@ -199,10 +200,33 @@ def main(accounts=None):
             logger_name=logger.name,
             context={"operation": "get_video_users"}
         )
-        logger.info(f"获取到 {len(accounts)} 个需要视频学习的用户")
+
+    # 根据 study_status.json 过滤已完成账号，失败的账号会被重试
+    study_status_map = completion_status.get_study_status()
+    filtered_accounts = []
+    for account in accounts:
+        username, password = account
+        username = str(username)
+        status_record = study_status_map.get(username, {})
+        completed_flag = status_record.get("completed")
+
+        if completed_flag is True:
+            results[username] = True
+            continue
+
+        if completed_flag is False:
+            logger.info(f"账号 {username} 上次提交失败，本次重试")
+
+        filtered_accounts.append((username, password))
+
+    logger.info(f"获取到 {len(filtered_accounts)} 个待处理的视频学习用户")
+
+    if not filtered_accounts:
+        logger.info("无待处理账号，结束视频任务")
+        return results
     
     try:
-        for account in accounts:
+        for account in filtered_accounts:
             username, password = account
             # 添加账号分隔符
             logger.info("=" * 60)
@@ -216,7 +240,11 @@ def main(accounts=None):
                 error_handler=auth_error_handler,
                 context={"username": username, "operation": "process_account"}
             )
-            results[username] = bool(result)
+
+            success = bool(result)
+            results[username] = success
+            # 成功后将状态从 false 更新为 true；失败则写入 false 供下次重试
+            completion_status.update_study_status(username, success)
             
             # 添加账号处理完成分隔符
             logger.info("=" * 60)
