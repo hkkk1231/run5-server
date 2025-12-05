@@ -38,6 +38,7 @@ _ERROR_PASSWORD_FILE_LOCK = Lock()
 
 # 账号 -> 红竞期望分数（原始值，可为 None / 空字符串 / 数字 / 字符串）
 EXPECTED_SCORE_BY_ACCOUNT: Dict[str, object] = {}
+ALREADY_SIGNED_KEYWORDS = ("重复报名", "已报名", "已经报名", "无需再次报名")
 
 
 @dataclass
@@ -311,7 +312,7 @@ def login(session: requests.Session,
 
 def sign_up(session: requests.Session,
             update_status: Optional[Callable[..., None]] = None) -> bool:
-    """报名环校跑，验证成功响应，否则按要求重试。"""
+    """报名环校跑，验证成功响应，否则按要求重试；已报名视作成功。"""
     sign_url = "https://lb.hnfnu.edu.cn/school/competition"
     data = {"competitionId": 38, "competitionName": "环校跑"}
     max_attempts = 10
@@ -341,6 +342,11 @@ def sign_up(session: requests.Session,
             if msg == "参赛成功" and code == 200:
                 if update_status:
                     update_status(status="报名完成", progress=0.15)
+                return True
+            if msg and any(keyword in str(msg) for keyword in ALREADY_SIGNED_KEYWORDS):
+                logger.info(f"报名接口提示已报名：{msg}，视为成功跳过重复操作")
+                if update_status:
+                    update_status(status="已报名", progress=0.15)
                 return True
             last_error = f"响应异常 msg={msg} code={code}"
             logger.warning(
