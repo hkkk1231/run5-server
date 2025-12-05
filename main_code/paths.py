@@ -68,6 +68,7 @@ RANK_RECORD_DIR = SPIDER_DATA_DIR / "rank_record"
 USER_AGENT_FILE = SPIDER_CONFIG_DIR / "user_agent.json"
 
 # Excel 文件
+EXCEL_SOURCE_FILE = SPIDER_DATA_DIR / "2025.9.1.xlsx"
 EXCEL_FILE = SPIDER_DATA_DIR / "2025.9.1_for_computer.xlsx"
 
 # ==============================================================================
